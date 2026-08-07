@@ -1,3 +1,144 @@
 
 NIST : 
 Cloud Computing : 
+
+
+AWS Global Infrastruture: 
+
+39 regions Across the globe as of today i.e; August 7th..
+
+Region: No technical definition for word called region.. its just physical location, AWS segregated entire world into different locations.. 
+
+Availability Zone : A distinct location within a region that's designed to be isolated from failures in other Availability Zones. Availability Zones within a region are connected through low-latency links. 
+Data Center or combination of Multiple DCs.. 
+
+PoP location / Edge locations : These are cached location or CDN (Content Delivery Network) locations.. 
+750+ Edge locations.. 
+
+
+windows: tracert google.com
+Linux: traceroute google.com
+ping google.com			
+
+=============================
+
+https://aws.amazon.com/free
+
+
+Account Creation success: 100$
+
+You perform 5 activities: 5 x 20$ = 100$
+
+Validity: 6 months
+
+
+Step 1 : Sign up for AWS
+
+Root user email address : your-email-address
+AWS account name : avinash-dev, avinash-sandbox
+
+Verify Email Address : your-email-address : ENTER CODE
+
+Setup a strong password
+
+
+Step 2 : Account Type 
+
+--> Personal (or) professional				===> Choose Personal
+--> Enter Your personal information
+
+Step 3 : Payment Page
+
+--> You can use UPI, credit Card, Debid Card
+--> 2 INR will be deducted and credit back to your acocunt
+
+** Until unless, you click on upgrade plan, You wont get charged anything. 
+
+
+Step 4 : identity proof and phone verification.
+
+aadhar / PAN / Passport / Driving License upload as PDF.. 
+phone number : call / SMS
+
+Step 5 : Choose Support plan
+
+
+1. Account and Billing related: activation and billing..
+2. Technical Assistance : Technical help from AWS
+
+
+Basic Support Plan : 
+--> Every account get this by default
+--> 24/7 access to AWS AI First Troubleshooting.. Re:Post, Amazon Q, Amazon Kiro CLI, AWS Documentation..
+--> Account and Billing related issues, 24x7 support from AWS
+--> Limited Trusted advisor checks
+--> No Technical Assistance from AWS Engineers team. 
+
+Business Support Plan : Starts from $29/Month.. 
+--> Minimum support plan AWS recommend us for our workloads. 
+--> AI powered 24/7 Support
+--> Account and Billing related issues, 24x7 support from AWS
+--> 24x7 technical assistance from AWS.
+--> FUll Trusted advisor checks
+--> Critical Case Response: < 30 Minutes
+
+Enterprise Support Plan : Starts from $5000/Month..
+--> Recommended support plan AWS recommend us for our Business critical workloads. 
+--> AI powered 24/7 Support
+--> Account and Billing related issues, 24x7 support from AWS
+--> 24x7 technical assistance from AWS.
+--> FUll Trusted advisor checks
+--> Critical Case Response: < 15 Minutes
+--> We get a TAM (Technical Account manager)
+--> Annual AWS Account Reviews and Architectural Reviews
+
+
+Unified Operations Support Plan : Starts from $50,000/Month..
+--> Recommended support plan AWS recommend us for our Missions critical workloads. 
+--> AI powered 24/7 Support
+--> Account and Billing related issues, 24x7 support from AWS
+--> 24x7 technical assistance from AWS.
+--> FUll Trusted advisor checks
+--> Critical Case Response: < 5 Minutes
+--> We get a TAM (Technical Account manager)
+--> Annual AWS Account Reviews and Architectural Reviews
+--> We get Assistance from AWS SMEs (Subject Matter Experts)
+--> TAM + DOmain Specialist + SME + Incident Management
+
+
+Case Severity: 
+General Guidence : < 24 hrs
+System Impaired: < 12 hrs
+Production System impaired: < 4 hrs
+production System Down: < 1 hr
+Business critical system down: < 15 Min
+Mission Critical business system down: < 5 Min
+
+=============================
+
+
+
+No Class TOmorrow.. ==> NEXT CLASS WILL BE ON MONDAY
+
+TOmorrow Monthly meetup: 02:00 PM to 05:00 PM in our office
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
