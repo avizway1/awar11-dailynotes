@@ -74,6 +74,8 @@ Basic Support Plan :
 --> Limited Trusted advisor checks
 --> No Technical Assistance from AWS Engineers team. 
 
+Developer Support Plan: Discontined
+
 Business Support Plan : Starts from $29/Month.. 
 --> Minimum support plan AWS recommend us for our workloads. 
 --> AI powered 24/7 Support
@@ -116,21 +118,81 @@ Mission Critical business system down: < 5 Min
 
 =============================
 
+D: 10/08/2026
+
+Root user: Account owner that performs tasks requiring unrestricted access.
+
+Root user will have unrestricted access. He can perform anything on this account (i.e; changing billing info, closing account).. 
+
+** AWS always recommend to enable MFA (Mult Factor Authentication) on our root account.
 
 
-No Class TOmorrow.. ==> NEXT CLASS WILL BE ON MONDAY
+---
 
-TOmorrow Monthly meetup: 02:00 PM to 05:00 PM in our office
+Adjust the AWS account Password settings, So all the users are enforced to use the same standard password polocies. 
+
+---
+
+Sign-in URL for IAM users in this account : https://828477980115.signin.aws.amazon.com/console
+
+Setup an alias for AWS account id, So we can use either ID / alias name. 
+
+https://avizway8.signin.aws.amazon.com/console
+
+---
+
+We have 2 types of AWS access:
+
+1. AWS management Console : Username, Password and Sign-in : Browser
+2. Programatic Access : AccessKey and SecretAccess key : CLI, Programatic, SDK, CDK.. : Later
+
+---
+
+IAM User : 
+
+Step 1 : Setup username
+--> Enable AWS Management console access
+--> Auti generating the password
+--> Enforcing to setup new password when login for the first time.
+
+Step 2 : Allocating policy
+
+policy: Set of permissions on our aws account.
 
 
 
+https://avizway8.signin.aws.amazon.com/console
+avinash
+Qt$d9IE1&9
 
 
+S3 : Simple Storage Service : AWS Version of Google Drive.. THis service designed to store objects (i.e; images, videos, documents)..
+
+EC2 : Elastic Compute Cloud : We can launch, run and manage servers. 
+
+RDS : Relational Database Service : Service to run databases for our applicaitons (mysql, postgresql, mssql)
+
+----
 
 
+Authentication : You can authenticate to an account (AWS/Gmail) using valid credentials (username and password)
+
+Authorisation : Are you allowed to perform this operation this operation.?..  
+
+----
+
+Least Privilages Mechanism: Allow user to perform activities based on his job role. (No Addl permisisons that he really required to perform his job)
+
+DBA : This team need permisisons on : RDS Service
+Storage : This team need permisisons on : S3 Service
+Network : This team need permisisons on : VPC Service
+User Management : This team need permisisons on : IAM Service
 
 
+Administrator Access : Provides full access to AWS services and resources.  
+--> Similar to root user, but no permisisons on Account and Billing management. 
 
+Poweruser Access : Same as Administrator Access, But no permisisons on IAM Service. 
 
 
 
