@@ -195,6 +195,97 @@ Administrator Access : Provides full access to AWS services and resources.
 Poweruser Access : Same as Administrator Access, But no permisisons on IAM Service. 
 
 
+===============================
+
+D: 11/08/2026
+
+
+Polocies : A JSON document contians set of permisisons on our AWS account. 
+
+AWS Managed policies : Based on Available servcies.. (iam full access, s3 read only access, ec2 full)
+AWS Managaed - Job Function : Based on standard jobs we have in market.. (i.e; DBA, network Admin)
+Customer Managed : Based on our requirement, we can create.. 
+
+** We cannot modify / Delete AWS managed polocies. 
+
+----
+
+IAM users max: 5000
+Groups per user : 10
+IAM ROles : 1000
+Managed policies: 1500
+
+IAM User can be member of 10 groups only
+IAM user can have 10 managed polocies directly.
+
+
+----
+Requirement 1 : I need an IAM User, we can access S3 and EC2 services.
+
+req1-awar11
+
+Created a user and allocated S3 policy and Ec2 policy to the user. THis user can access only S3 and Ec2 service, technically, we call this as implicit allow. Remaining all the services will be denied. 
+
+------
+
+Requirement 2 : I need an IAM user who has access on all the aws services, but not on S3 service.
+
+req2-awar11
+
+
+E : Effect : Allow / Deny			: Deny
+A : Actions : s3:* 					: Everything on S3
+R : Resources : *					: All resources
+
+ARN : Amazon Resource Name : This gives uniqueness to the AWS component.
+
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Deny",
+			"Action": "s3:*",
+			"Resource": "*"
+		}
+	]
+}
+
+
+
+Explicit Deny: Explicitly we are denying S3, So DENY will have highest priority always. 
+(User level, Group level, Resource level --> DENY will have priority).
+You allow 100 times but deny 1 time at any level --> DENY takes effect.
+
+
+================
+
+Requirement 3 : I need an IAM user who has access on all the aws services, but there is one particular bucket, bucketname: avinash2807, THis user should not able to delete the object.
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Deny",
+            "Action": [
+                "s3:DeleteObjectVersion",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::avinash2807/*"
+        }
+    ]
+}
+
+=================
+
+
+
+
+
+
 
 
 
