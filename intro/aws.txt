@@ -281,6 +281,39 @@ Requirement 3 : I need an IAM user who has access on all the aws services, but t
 
 =================
 
+D: 12/08/2026
+
+
+Requirement 4 : I need an IAM user who need full access on s3 service. 
+--> S3 should be accesable when the user is in corporate network only.
+
+https://checkip.amazonaws.com/
+
+49.206.56.39/32
+
+
+--------------
+
+MCP : Model Context protocol : 
+
+------
+
+inline policy : Alligned to one particular entity. 
+--> When an existing user reached maximum policy limits.
+--> You need a policy only for one user, no reusability required.
+
+Problem: Its hard to track. 
+
+------ 
+
+
+
+
+
+
+
+
+
 
 
 
