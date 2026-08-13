@@ -304,8 +304,42 @@ inline policy : Alligned to one particular entity.
 
 Problem: Its hard to track. 
 
------- 
+==============================
 
+D: 13/08/2026
+
+
+IAM Policy : What permissions are granted.				: s3fullaccess
+Permissions Boudnary : Maximum permissions allowed.		: s3fullaccess
+
+----
+
+Q: Someone deleted an S3 bucket, We need to identify, who performed it.!!
+
+--> To track IAM user activities / AWS activities, We can depend o Cloudtrail service.
+
+Cloudtrail : 
+
+Enabled by default.. 
+--> By Default, it will store last 90 days activities.
+--> We can create trail and store logs for unlimited days (S3 / Cloudwatch logs).
+--> We can use default filters to search user activities.
+--> We cannot alter / delete the logs in cloudtrail.
+
+--> IAM is a global service, You cannot find IAM servcie logs in regular regions.
+--> All IAM / Other global service logs stores in "N.Virginia" only. 
+
+----
+
+Access Analyser: 
+
+External access findings: Identify resources shared with an external entity
+
+Internal access findings: Identify internal IAM users and roles that can access specific resources
+
+Unused access findings: Identify IAM users and roles with unused access
+
+----
 
 
 
