@@ -1,0 +1,99 @@
+
+EC2 : Elastic Compute Cloud : 
+
+Server : Virtual Machiene : EC2 (AWS) : Azure VM (Azure) : GCP (Compute Engine)
+
+Basically a server is a powerful computer that serves information, files, or services to other computers. How a server works:
+1. The request: You click a link, check your email, or open an application.
+2. The delivery: Your device sends a digital request over the internet to the server.
+3. The response: The server processes a request then it sends the response back to your device.
+
+
+The commonly used servers are:
+- web servers
+- game servers
+- file servers
+- mail servers
+- Database Server
+- Caching Server
+
+Why can't we use our laptop/low hoardware as a server?
+1. Servers never sleep. They are designed to run 24 hours a day, 365 days a year without crashing.
+2. They are built for huge traffic handling. A laptop can handle one user or ten users but a server handles thousands of users at the exact same time.
+
+------------
+
+--> pay-as-you-go : Pay for the resource you actually use.
+--> pay-as-you-grow : Pay for the resources usage basis.. (more customers --> more servers --> more price)
+--> Go global in minutes
+
+------------
+
+1. On-Demand Instances : 
+--> No commitmenet with AWS - pay-as-you-go.
+--> Dev/IT/Test, Unptedictable workload, New application testings.
+--> Most expensive per hour.
+--> AWS cost us per seconds with min 60 sec.
+
+---------
+
+2. Reserved Instance : 
+--> Commitment for 1yr / 3 yrs.. You get big discount in the pricing.
+--> This is best for a steady predictable workload or an always-on kind of application. 
+
+Reserved instances we have two options:
+1. Standard reserved instance: This will be locked to a specific instance type or region with a good discount.
+2. Convertible reserved instance: We can change the instance family/size at a slightly lower discount than a standard reserved instance but we have that flexibility to change the configuration.
+
+Three pricing options in reserved instances:
+1. Full upfront: pay 100% of the amount and you get your instance.
+2. Partial upfront: pay 30-60% of the amount now then AWS will reduce the hourly price, you pay based on the reduced hourly price.
+3. No upfront: pay everything on a usage basis.
+
+** We can sell our reserved instances in AWS Marketplace, if we dont want it anymore. 
+
+---------
+
+3. Savings Plan : Savings Plans are a flexible pricing model that offer low prices on AWS usage, in exchange for a commitment to a consistent amount of usage (measured in $/hour) for a 1- or 3-year term.
+
+Compute Savings Plans : Applies to EC2 instance usage, AWS Fargate, and AWS Lambda service usage, regardless of Region, instance family, size, tenancy, and operating system.
+
+EC2 Instance Savings Plans : Applies to instance usage within the committed EC2 family and region, regardless of size, tenancy, and operating system.
+
+Database Savings Plans : Applies to Aurora, RDS, DynamoDB, ElastiCache, Amazon DocumentDB, Neptune, Amazon OpenSearch Service, and other services regardless of supported engine, instance family, size, deployment option, or Region.
+
+SageMaker Savings Plans : Applies to SageMaker service usage, regardless of Region, instance family, and component.
+
+---------
+
+4. Spot instances
+--> Bid for spare capacity. If our price is matching with aws spot price, aws provides an ec2 instance.
+--> These instance can be interrupted at any time, problem is: 2 minutes warning period. 
+--> If our application can be interrupted, even if any interruptions happen, no effect on our business processes 
+
+--> If price changed, AWS terminated the instance, we no need to pay for partial hours.
+--> If price not changed, YOU terminated instance, You need to pay for full duration.
+
+2 hrs 55 Minutes ==> 
+AWS terminate: 2 Hrs
+YOU terminate: 2 hrs 55 Minutes
+
+---------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
