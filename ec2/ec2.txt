@@ -78,8 +78,134 @@ SageMaker Savings Plans : Applies to SageMaker service usage, regardless of Regi
 AWS terminate: 2 Hrs
 YOU terminate: 2 hrs 55 Minutes
 
----------
+===========================================
 
+D: 17/08/2026
+
+General Purpose : balanced CPU + memory + network performance = T / M
+Compute Optimised : More CPU powered Instancea categery : C
+Memory Otimised : works load that req more data storage in RAM : R, U, X, Z
+Storage optimised : High IOPS / Throughput : I, D, H
+Accelerated Computing : CPU Installed and supported hardware : P, G, Trn
+HPC : High performance compute : hpc
+
+IOPS : Input and Outpur operations per second.
+
+i --> intel Processor
+a --> amd processor
+g --> graviton processor
+
+========
+
+Common Naming strategies we use in real environments
+
+P-LNX-WEB-ICI-03
+
+[Environment]-[Platform]-[ServiceType]-[clientID]-[S.No]
+
+Environment: 
+P --> Production
+U --> uat
+Q --> QA 
+D --> Dev
+T --> Training
+S --> sandbox
+L --> Central Logging
+N --> Central Networking
+
+Platform: 
+windows : WIN
+linux : LNX
+
+Service Type: 
+APP : application server
+DBS : database server
+Web : web server
+FSR : file server
+MEX : exchange server
+HDP : hadoop distro
+
+Client / Project id: 
+INT : Internal
+YES : yes bank
+ICI : icici bank
+HDF : hdfc bank
+
+---
+
+
+Step 1 : Name and tags
+
+Tag used to add metadata for our instance. 
+
+Name = above standard
+project = Project X
+Client id = client id
+Cost Center = AAZAA
+Platform = Linux / Windows
+owner/point of contact = Avinash
+
+
+Step 2 : Application and OS Images (Amazon Machine Image) - Choose AMI
+Choosing an AMI is nothing but selecting a preinstalled and configured operating system image to run along with the hardware. 
+
+Step 3 : Choose Instance type
+
+t3.micro
+t3.small
+c7i-flex.large		--> Choose This
+m7i-flex.large
+
+Step 4 : choose keypair
+
+An AWS key pair is a security credential mechanism used to authenticate your identity when connecting to an EC2 instance. It uses an asymmetric encryption method, meaning a public key and private key method. 
+
+AWS holds the public key and we will have our private key. When we want to get connected to the instance, we need to browse for the private key. The public key will be validated and verified against the private key we shared. If it matches, it allows us to log in or it generates a password. 
+
+Public Key ==> With AWS		==> Inside ec2 instance (~/.ssh/authorized_keys)
+Private key ==> With us
+
+	  laptop					AWS Cloud/Instance
+	Private key	------------------>	Public Key			==> Matching, pwd generates
+
+
+Step 5 : network COnfiguration
+
+Firewall (security groups) : A security group is a set of firewall rules that control the traffic for your instance. Add rules to allow specific traffic to reach your instance.
+
+ports: 65536 : 0 - 65535
+
+Windows connect : RDP : Remote Desktop Protocol : 3389
+Linux connect : SSH : Secure shell : 22
+web : http : 80
+secure web : https : 443
+DNS : 53
+ftp : file transfer protocol : 20 & 21
+NFS : Network File System : 2049
+mysql : 3306
+mssql : 1433
+postgresql: 5432
+
+
+From where you want to connect to instance.
+
+1. anywhere : 0.0.0.0/0 :::/0
+2. Custom : we can provide custom network IP addresses here. 
+3. myIP : This picks your currently connected network IP address. 
+
+Step 6 : Configure storage (EBS)
+
+Windows: 30 gb
+Linux: 8 gb / 10 gb
+
+=================
+
+To connect to Windows instances we need to have the supported tool:
+1. If you are using a Mac operating system, you download the Windows app from the App Store.
+
+2. Windows OS : 
+	search --> "remote Desktop" --> open app and provide instance public ip, Username, password.. popup yes
+	windows+r --> type "mstsc" --> click enter --> instance public ip, Username, password.. popup yes
 
 
 
