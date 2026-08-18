@@ -207,6 +207,142 @@ To connect to Windows instances we need to have the supported tool:
 	search --> "remote Desktop" --> open app and provide instance public ip, Username, password.. popup yes
 	windows+r --> type "mstsc" --> click enter --> instance public ip, Username, password.. popup yes
 
+=================
+
+
+D: 18/08/2026
+
+Linux Instance launch
+
+1. Add tags
+2. Choose an AMI (Amazon Machiene Image) - OS (default username: ec2-user (redhat: redhat), (ubuntu: ubuntu/ec2-user))
+3. Choose an Instance Type - t3.micro
+4. Choose keypair : existing keypair / New keypair (.pem and .ppk)
+5. Create/Choose a SG : port 22 : SSH : MyIP / Anywhere / Custom
+6. Choose Storage : 8 Gb
+7. Review and create
+
+
+.pem ==> Private Enhanced Mail (open Standard), Native OpenSSH
+.ppk ==> Putty Private key (proprietary format), PuTTY
+
+We have an option to convert .pem to .ppk using PuttyGen
+
+
+---
+
+Linux is a free open-source operating system model designed on Unix, serving as a foundational backbone for most of the world's internet servers, cloud infrastructures, and supercomputers. 
+
+Why organisations prefer to choose Linux:
+1. Zero licencing cost. Linux is entirely free to download, use, and modify without purchasing licences or activation keys.
+2. Extreme stability and performance. Linux can handle system memory more effectively. Linux servers frequently run for years without requiring a single reboot.
+3. High security. The Linux operating system is inherently less vulnerable to malware, ransomware, and viruses due to its strict user privilege model.
+4. Absolute customizations. As Linux comes under open source users can change the components, add the visual layouts, and modify the commands and there are no legal issues.
+5. Hardware longevity. Linux is very, very lightweight and can run on any kind of hardware. You can use very basic hardware like a Raspberry Pi or any other hardware and we can run the Linux operating system there.
+
+=============
+
+Connectivity : 
+
+(WINDOWS / LINIX / MACOS)
+
+Option 1 : Browser based connect : Choose instance, Click on connect, choose "In web browser", select "EC2 Instance Connect", then click on connect. 
+* Your SG must be open Anywhere.
+* Browser pop-up should not block
+* WE DONT USE THIS OPTION IN REAL ENVIRONMENTS. 
+
+----------
+
+Option 2 : (WINDOWS / LINIX / MACOS)
+
+search for "cloudshell", and from action, choose "upload file", Upload the Keypair required/associated with instance. 
+
+run chmod 400 command to remove public readable permission. 
+then you can connect to instance using below command
+
+ssh -i <keypair-name> <username>@<public-ip/public-dns>
+
+----------
+
+Option 3 : LINUX / MACOS 
+
+We can use OS default terminal, Open terminal, Navigate to the location where we have keypairs.. 
+
+Then, run chmod 400 <keypair>
+then after.. ssh -i <keypair> <username>@<public-ip>
+
+whoami
+hostname
+
+----------
+
+Option 4 : Windows : Command prompt / Powershell
+
+--> open "cmd" type "ssh"
+
+If your command prompt says `SSH` is not a recognised command, then you need to perform the below steps:
+1. Open Settings, go to System, then "Optional features".
+2. Under Features click on "View features" next to "Add an optional feature," then install "Open SSH Client" --> next --> install.
+
+
+linux: chmod 400 keypair
+Windows: 
+
+icacls "C:\path\to\your\keypair" /inheritance:r
+icacls "C:\path\to\your\keypair" /grant:r "$($env:USERNAME):(F)"
+
+----------
+
+Option 5 : WINDOWS, LINUX, MACOS
+
+Install git tool in your laptop.
+
+git-scm.com.. You an use git bash to connect to linux instance...
+
+----------
+
+Option 6 : We can use putty tool to connect. 
+
+Download and install putty tool.  ** THis tool wont work in MacOS
+
+
+Provide public IP.
+Connection --> SSH --> Auth --> Credentails --> Browse the ppk file and connect. 
+
+
+Putty dont support .pem, so we need to conmvert .pem to .ppk using "puttygen"
+
+------------
+
+Option 7 : 3rd party tool named: mobaXterm
+
+------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
