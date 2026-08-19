@@ -1,0 +1,105 @@
+
+
+Linux: Linux is a free open-source operating system based on Unix. It is created by Linus Torvalds and first released in 1991. Linux is used almost everywhere, like servers, desktops, mobile phones, cloud, and even iOS devices also. 
+
+While Linux is free, secure, stable, flexible, fast, and community-driven 
+
+Open Source: open source means the source code is freely available for anyone to view, modify, and share. 
+Just like Linux, there are some open-source software examples: Apache, MySQL, and Kubernetes are open source. 
+
+Popular Distros:
+general Purpose			: Ubuntu, linux mint, fedora
+Enterprise Servers 		: RHEL (Redhat), SuSE, oracle, Amazon Linux
+Community Server		: CentOS, Alma Linux
+Security Testing		: Kali Linux, Parrot OS
+Lightweight / container	: alpine, bookwarm, puppylinux, trixie
+
+
+How OS boots:
+1. Hardware Initialisation. 
+	1.1  When we press the power button the motherboard's firmware, like BIOS or UEFI loads.
+	1.2. It runs a POWER ON SELF TEST (POST) to check the crucial hardware like RAM, CPU, and storage. Uses primary boot device. 
+
+2. Boot Sector: Firmware looks for execution instructions from the storage disc partition layout. 
+
+--> Generally we will have something called the Master Boot Record (MBR) and 
+--> In recent devices we are getting something called EFI or UEFI. It bypasses the entire MBR thing and reads execution files directly from storage partitions. 
+--> This boot sector primarily finds and runs the primary boot loader. 
+
+3. Bootloader (GRUB2)
+
+--> Grand Unified Bootloader (GRUB) is the most common software responsible for loading our operating system. It displays a splash menu for users to select an operating system or kernel version if they have configured multiple operating systems. 
+
+Otherwise it picks a default operating system and it loads. 
+--> In the backend it loads the Linux kernel image from vmlinuz and the initial RAM file system (initramfs) into system memory. 
+
+4. Lunux Kernel: 
+--> It acts as a translation layer and bridge between user software applications and the physical computer hardware, like a CPU, memory, and devices. 
+
+5. Initialisation System (systemd) : the kernel executes the initialisation daemon as the very first user-space process, granting it a process ID. Systemd acts as a master controller, reads the configuration target files, and spins up required processes concurrently. 
+
+
+RunLevels: 
+init 0 : shutdown								--> systemctl poweroff
+init 1 : Single user mode
+init 2 : multiple user mode with no network
+init 3 : multiple user mode with network
+init 4 : user-defined (blank by default)
+init 5 : Full Desktop Mode
+init 6 : Reboot									--> systemctl reboot
+
+
+In linux OS, Everything starts from "/"
+
+/bin 	: Binary Executables : Contains all essential binary files used by all users. 
+
+/boot	: Boot loader files : Linux kernel and boot loader and support files
+
+/root	: home directory for root user  (c:/users/Administrator)
+
+/home	: Home directory for regular/non-root users..
+
+/dev	: Device files : Contains all attached hardware realted files i.e; hdd, nic (windows device manager)
+
+/etc	: Configuration files (Editable Text Configs) : /etc/passwd, /etc/httpd/conf/httpd.conf
+
+/var	: variable files : Contains data that changes frequently (logs, database, web content)
+
+/sbin	: system binaries : it primarily stores essential executable files used for system administration, maintenance, and reboot tasks. 
+
+/mnt	: We can use this path to mount the devices (hdd)
+
+/tmp	: temporary location
+
+/usr	: user programs : contains user level programsn and libs. 
+
+
+/proc: Process inforamtion
+/lib : similar to windoes .dll files
+/media : removable media
+
+
+cd 		: Change Directory
+cd /	: Takes us to / path
+cd ..	: Take us to one step back in the path
+cat 	: We can read info from document.
+ls		: List files/directories 
+pwd		: Print Working Directory
+whoami	: Tells us as what user we are working
+
+touch <filename>
+
+touch		--> Create a zero byte file
+ls -a		--> List everything including hidden
+
+
+
+
+
+
+
+
+
+
+
+
