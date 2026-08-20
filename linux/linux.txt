@@ -93,6 +93,156 @@ touch		--> Create a zero byte file
 ls -a		--> List everything including hidden
 
 
+===============================
+
+D: 20/08/2026
+
+Launch Template : A launch template can help us to configure settings for our EC2 instance that we launch multiple times. 
+
+We do not need to manually launch instances with the same settings every single day. You configure all the settings once and you can use a launch template. 
+It gives all same settings whenever we are launching a new instance. 
+
+
+mkdir			: Command to create a durectory
+
+mkdir songs
+mkdir videos
+
+cp				: Copy and Paste
+
+cp s* songs/	: picks all files and dir and copy to songs directory (directory imits here)
+
+cp -r <dir> <dir>	: Copy entire directory to another directory
+
+mv <file> <path>	: Cut and Paste
+
+mv dir/ dir/		: Move a directory to another directory
+
+mv dir/* dir/		: pick all files from source dir to moves to target dir
+
+mv v* dir/			: pick all the files name starts with v and move.
+
+mv oldname newname	: MV also helps to rename
+
+
+------
+
+rm					: Remove or Delete operation
+
+rm s*				: Delete all the files name starts with s
+
+rmdir <dir-name>	: Works only for empty directory
+
+rm -r <dir-name>	: Recursively delete the directory
+
+rm -rf <dir-name>	: Recursively and Forcefully delete the directory (Be cautious when using it)
+
+rm songs/*			: keeps the directory but delete all files inside the directory
+
+-----
+
+.					: Represent current path
+
+man <command>
+
+cp /etc/passwd .	: copy the passwd file from /etc folder to current location.
+
+cat <file>			: displays all the file content
+
+more <file>			: Displays content page by page. Helpful when working with long text files. (enter - next line ... space bar - Next page)
+
+
+tail 				: Displays bottom 10 lines of the file
+
+tail <filename>		: Displays bottom 10 lines of the file
+
+tail -f <filename>	: Displays bottom 10 lines of the file and continuously stream new updates as they happen.
+
+tail -n 20 -f <filename>
+
+tail -n 20 passwd	: Displays the bottom 20 lines of the file
+
+head 				: Displays the top to lines
+
+head -n 5 passwd	: Displays the top 5 lines of the file
+
+sort passwd			: Sort the file content based on alphabetic order
+
+sort -r passwd		: Sort the file content based reverse alphabetic order
+
+---------------
+
+grep : global regular expression print : helpful command to search text within files..
+
+grep "root" passwd				: search for root work in passwd file. - case sensitive
+
+grep -i "root" passwd			: search for root work in passwd file. - case insensitive
+
+grep "root" file1 file2
+
+grep -r "root" /path			; search the entire path recursively
+
+
+ps aux | grep "ec2-user"
+
+---------------
+
+vim : VI improved Editor : 
+
+text editor: vi, vim and nano
+
+
+vim myinfo.txt
+
+Command Mode : This mode is primarily for navigation and other file operations.
+Insert Mode : Used for entering text into the file.
+
+
+Switch modes:
+Command mode --> press "i" --> You enter insert mode
+Insert mode --> press "esc" --> You enter command mode
+
+To save file and Quit from Editor			:wq
+
+Quit from Editor without saving changes 	:q!
+Ignore the changes and quit editor
+
+
+o			: open a new line below the current line and enter into insert mode.
+
+k			: move cursor one line up
+j			: move cursor one line down
+
+dd			: Delete the entire line where our cursur is placed
+
+
+dd			: cut the lines
+p			: Paste the cut lines at cursor
+
+5dd			: Delete the next 5 lines from the cursor
+100dd		: Delets the next 100 lines from the cursor
+
+:set number	: Add the line number
+:set nonumber	: Removes the line number
+
+nG				: Move cursur to specific line number (n = number)
+10G				: move cursor to line number 10
+
+:undolist		: Shows change history
+2u				: it undo last 2 changes
+
+/word			: search for the word
+
+-------------------
+
+
+
+
+
+
+
+
+
 
 
 
