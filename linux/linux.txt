@@ -235,6 +235,149 @@ nG				: Move cursur to specific line number (n = number)
 
 -------------------
 
+D: 21/08/2026
+
+Repo Configuration: /etc/yum.repos.d (or) /etc/dnf/dnf.conf
+
+RPM : Redhat Package Manager : it doesn't have the capability to resolve the dependencies automatically. We manually need to download the dependency files as well. 
+
+rpm -ivh package.rpm
+
+YUM : Yellow dog updater modified : Yum is a wrapper around RPM that can automatically resolve dependencies. This has the capability to resolve the dependencies from the listed repositories. 
+
+yum install httpd
+yum install nginx
+
+dnf (Dandified YUM) : all the new-age Linux distributions are already using DNF or switching from Yum to DNF as it has a lot of betterments with respect to dependency resolutions. 
+
+dnf install httpd
+dnf install nginx
+
+dnf search <package>
+dnf info <package>
+
+
+dnf install tree
+
+
+---------
+
+Option 1 : provide Sudo permisisons to the user, so the user can perform activities by placing sudo infront of the command.  
+ec2-user will have sudo permissions by default. So just add "sudo" and execute the command.
+
+sudo dnf install tree			--> Interactive, Manual action required. 
+sudo dnf install tree -y		--> NonInteractive, Pick yes as option and continue installation.
+
+which <comamnd>
+which ls
+which tree
+
+Option 2 : Switch to root user and perform the required installation. 
+
+variable = vary + able
+
+sudo su		: It won't load root user's environment variables. 
+sudo su -	: switch root user with login shell, loads root's environment variables and simulates a fresh root login. This is best for admin-related activities. 
+sudo -i 	: same as "sudo su -", It loads root user's environment variables and automatically moves to /root path. 
+
+dnf install tree -y
+
+------------
+
+
+sudo dnf install httpd -y
+
+sudo systemctl start <service>
+sudo systemctl stop <service>
+sudo systemctl restart <service>
+sudo systemctl stop <service>
+
+sudo systemctl status httpd
+sudo systemctl start httpd
+sudo systemctl stop httpd
+sudo systemctl restart httpd
+sudo systemctl stop httpd
+
+
+sudo systemctl status httpd
+
+
+sudo systemctl enable httpd			--> Starts the httpd service after reboot automatically. 
+
+sudo systemctl enable httpd --now	--> start + enabling statup
+
+ERR_CONNECTION_TIMED_OUT	: The problem is with the security group. You need to open the required port in the security group inbound rules. 
+
+ERR_CONNECTION_REFUSED		: The problem is with the service. Make sure you verify your service is in a running state. 
+
+
+Restart your linux instance: 
+sudo reboot
+sudo init 6
+
+
+run --> services.msc	--> observer "startup type"
+
+DocumentRoot Path: whatever we place here will be delivered as web content. 
+
+apache : /var/www/html/	
+nginx : /usr/share/nginx/html/
+
+cd /var/www/html/
+sudo vim index.html
+
+---
+
+apache configuration path: /etc/httpd/conf/httpd.conf
+
+cd /etc/httpd/conf
+sudo vim httpd.conf
+
+47G
+
+change LISTEN 80 to LISTEN 8080
+
+--> As we did configuration changes, We need to Restart the httpd service
+sudo systemctl restart httpd
+
+http://65.0.61.86:8080/
+
+
+
+--> Apache 8080
+--> nginx 80
+
+=========================================
+
+UBUNTU: 
+
+sudo apt install <pkg>
+sudo apt update
+sudo apt remove pkg
+sudo apt search pkg
+sudo apt show pkg
+
+
+=========================================
+
+
+echo "hello from Aviz"		--> hello from Aviz
+
+>		--> Overwrite		--> Erase existing info and add new info
+>>		--> Appends			--> Adds info to existing lines
+
+
+echo "hello" >> morning.txt
+echo "Good Morning" >> morning.txt
+echo "Its Friday" >> morning.txt
+
+echo "Feeling like a holiday" > morning.txt
+echo "Still we need to work" > morning.txt
+
+echo -e "hello\nfrom\nAvinash"
+
+======================================
+
 
 
 
