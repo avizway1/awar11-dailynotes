@@ -239,6 +239,8 @@ D: 21/08/2026
 
 Repo Configuration: /etc/yum.repos.d (or) /etc/dnf/dnf.conf
 
+--> sometimes we need to add repos to our linux instance, then only we can download and install some packages.
+
 RPM : Redhat Package Manager : it doesn't have the capability to resolve the dependencies automatically. We manually need to download the dependency files as well. 
 
 rpm -ivh package.rpm
@@ -378,16 +380,111 @@ echo -e "hello\nfrom\nAvinash"
 
 ======================================
 
+D: 22/08/2026
+
+top : this command shows a real-time view of all the running processes.  (press q - exit)
+
+press "P" to sort processes by CPU usage.
+Press "M" to sort processes by Memory Usage.
+
+htop : this is the same as the stop command but with a better UI. 
+By default we don't get it. We need to run `sudo dnf install htop -y` to install. 
+
+sleep 100 &
+
+htop --> f4 --> search with process name
+
+nproc 	--> displays the cpu count
+
+sudo dnf install stress-ng -y
+
+stress-ng --cpu 1 --timeout 120 &
 
 
+ps				: Shows the list of processes attached to the terminal. 
+ps aux 			: a (all users), u (user.owner), x (not attched to terminal)
+
+ps aux | grep sleep
+ps aux | grep stress
 
 
+ps aux --sort=-%cpu | head
+ps aux --sort=-%mem | head
+
+To kill a process we can use the `kill` command but we have two primary signals:
+
+1. Signal 15 : SIGTERM : termination: The default signal sent by the `kill` command to ask a process to save its state and shut down safely. 
+
+2. Signal 9  : SIGKILL : it forcefully terminates the process. If any process is blocking or stopping it from killing it, it will forcefully kill that. 
 
 
+kill 27937		
+kill -9 27937
+
+pstree : this command shows the process tree in a hierarchical manner. 
+
+pidof httpd		: identify the process if
+pgrep httpd		: 
+pkill <p-name>	: kill a process using name (pkill sleep)
+
+nohup			: no hangup : this command allows a command or script to keep running even after you log out, disconnect, or close the terminal window. 
+
+cat /etc/os-release
+
+-----
+
+free
+free -h
+free -m 
+free -g
+watch -n 5 free -h
+
+==================================================================
+
+User Management in Linux OS
+
+/etc/passwd			: user Details
+/etc/shadow			: Encrypted passwords
+/etc/groups			: Group details
+/etc/sudoers		: Cant edit directly, sudo permisisons applied using this file entries.
+
+who					: Shows who all are logged in to this instance. Also displays the user's public IP address. 
+
+id <username>		: shows the user id of root. THis will be always "0"
+id ec2-user 1000
+id avinash 1001
+
+sudo useradd avinash				
+
+sudo useradd -m avinash 						: Create a user along with a home directory. Most of the time a home directory is not required, as it is automatically created. 
+
+sudo useradd -c "linux demo awar11" avinash		: Create a user with a comment. 
+
+sudo useradd -M aravind							: Create a user without a home directory. 
 
 
+sudo passwd avinash							: Set up a password for the defined user. 
+
+su avinash									: switch to avinash user
+
+sudo groupadd developers					: Create a group named developers. 
+sudo usermod -aG developers avinash			: Adding Avinash user to the developers group 
+
+sudo gpasswd -d avinash developers			: Remove Avinash users from the developers group. 
+sudo groupdel developers					: Command to delete the developers group 
 
 
+sudo usermod -aG wheel avinash				: Adding Avinash user to wheel group so he can get sudo permissions. 
+
+cat /etc/group								: View the group and group members. 
+getent group wheel							: View the group and group members. 
+
+
+sudo usermod -L avinash						: Locking or disabling the user 
+sudo usermod -U avinash						: UnLocking or Enabling the user 
+
+sudo userdel avinash						: Delete the user avinash, but keeps the home directory.
+sudo userdel -r anudeep						: Delete the user Anudip along with his home directory. 
 
 
 
