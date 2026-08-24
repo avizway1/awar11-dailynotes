@@ -486,7 +486,140 @@ sudo usermod -U avinash						: UnLocking or Enabling the user
 sudo userdel avinash						: Delete the user avinash, but keeps the home directory.
 sudo userdel -r anudeep						: Delete the user Anudip along with his home directory. 
 
+================================
 
+D: 24/08/2026
+
+Logging into an EC2 instance by using a custom user with a password 
+
+
+sshd : SSHD is nothing but Secure Shell Daemon. This service helps us to establish connectivity to Linux using the SSH protocol. 
+sssd : System Security Services Daemon. This service provides authentication and identity management for Linux operating systems. 
+
+
+pre-req: setup password for the user
+
+1. ssh configuration : /etc/ssh/sshd_config
+
+at line number 65, change PasswordAuthentication to "yes"
+
+2. cloud-init configuration : /etc/cloud/cloud.cfg
+
+at line number 17, ssh_pwauth to "true"
+
+sudo systemctl restart sshd
+sudo systemctl restart sssd
+
+==============
+
+ls 
+ll
+ls -ll
+
+-rw-r--r--. 1 ec2-user ec2-user 0 Aug 24 02:04 a.txt
+drwxr-xr-x. 2 ec2-user ec2-user 6 Aug 24 02:06 songs
+
+-	rw-		r--		r--
+
+-	: regular file
+d	: directory
+b	: block device
+l	: symbolic link
+
+d		rwx			r-x			r-x			2 	ec2-user	ec2-user	6 		Aug 24 02:06 	songs
+type	owner		group		others			user		group		size	modified	file name
+
+
+
+owner	: o
+group	: g
+others	: o
+
+
+read 	: r : view file content and he can list directories. 
+write	: w : you can edit the file content or create/delete the file inside a folder or directory. 
+execute	: x : we can run that file as a programme or enter the directory. 
+
+octal method permisisons management
+
+read	: r : 4
+write	: w : 2
+execute	: x : 1
+None	: -	: 0
+
+
+7	: rwx	: 4+2+1 : Full Access
+6	: rw-	: 4+2+0 : Read and Write
+5	: r-x	: 4+0+1 : Read and execute
+4	: r--	: 4+0+0	: Read Only
+0	: ---	: 0+0+0	: No Access
+
+chmod 400 keypair
+
+u = read only
+g = no access
+o = no acess
+
+
+getfacl filename
+
+
+
+Scenario 1 : Only owner can get read write and execute
+
+mkdir ~/mypersonal
+
+chmod 700 mypersonal		(700 - full permisisons for user, no permisisons for group and others)
+
+
+Scenario 2 : Team collabaration folder
+
+cd /opt
+sudo mkdir teamproject
+sudo groupadd developers
+
+sudo usermod -aG developers avinash
+sudo usermod -aG developers anudeep
+
+sudo chgrp developers teamproject/
+
+sudo chmod 774 teamproject/
+
+The owner and the developers group can perform any operation in this folder but whoever falls into the others category gets only read permissions. 
+
+
+Scenario 3 : Sticky bit permissions : everyone will have permissions but only the user who created the file can delete it. No other user can delete it. 
+
+sudo mkdir sharedfolder
+sudo chmod 1777 sharedfolder/
+
+==============================
+
+
+variable = vary + able
+
+
+#!/bin/bash
+
+#!	: Shebang : the operating system kernel looks at these two bytes and it will treat all remaining things as commands. 
+/bin/bash		: The absolute path for the Bash interpreter 
+
+
+export NAME=anudeep
+export QUAL=PHD
+
+
+#!/bin/bash
+echo "hello from $NAME"
+echo "My qualification is $QUAL"
+
+
+To add environment variables permanently  : 
+vim ~/.bashrc
+
+source ~/.bashrc
+
+=====================
 
 
 
