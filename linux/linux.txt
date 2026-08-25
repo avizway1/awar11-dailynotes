@@ -621,6 +621,174 @@ source ~/.bashrc
 
 =====================
 
+D: 25/08/2026
+
+Public IP : a public IP address is unique across the globe. Once it is allocated to a device, it won't be allocated to any other device across the globe. 
+
+Private IP : a private IP address is unique within the network. Works only within our network, i.e; intranet 
+
+
+curl https://checkip.amazonaws.com/
+curl https://ifconfig.me/
+
+Shows the network interfaces and Associate IPs..
+ifconfig
+ip addr
+ip -br addr
+
+-----
+
+IMDS : Instance MetaData Service: 
+
+v1 : less secured - SSRF Attack - Server Side Request forgery
+v2 : Secured - It need a token to access the URL
+
+V1: 
+
+curl http://169.254.169.254/latest/meta-data/instance-id
+
+ami-id
+ami-launch-index
+ami-manifest-path
+block-device-mapping/
+events/
+hostname
+identity-credentials/
+instance-action
+instance-id
+instance-life-cycle
+instance-type
+local-hostname
+local-ipv4
+mac
+metrics/
+network/
+placement/
+profile
+public-hostname
+public-ipv4
+public-keys/
+reservation-id
+security-groups
+services/
+
+v2 : generate token
+
+curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"
+
+AQAEAJ9U_98PT1_QqRHi9Hu0-DbbwwzHHzTK316E-7NfhSpxqYRT9A==
+
+export TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600")
+
+curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4
+
+curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/network/interfaces/macs/0a:05:70:23:f3:e7/vpc-id
+
+
+==============
+
+curl -o https://google.com/file.txt
+wget google.com
+
+-----
+
+Ping helps to perform the reachability check and latency check. 
+
+ping google.com
+ping <server-ip>	
+
+ping -c 3 google.com
+
+
+ICMP : internet COntrol Message Protocol
+
+To ping and get a response from our AWS-hosted EC2 instance, we need to open ICMP echo request and echo reply in our EC2 instance's associated security groups' inbound rules. Only then do we get a ping response from our EC2 instance. 
+
+-----
+
+To adjust our EC2 instance name we can use the `hostnamectl` command in the Linux operating system. 
+
+sudo hostnamectl set-hostname mywebserver
+
+DNS Configurations in Linux OS:
+/etc/resolv.conf
+/etc/hosts
+
+-----
+
+PORT STATUS VERIFICATIONS: 
+
+netstat (Network Statistics)
+ss (Socket Statistics)
+
+ss
+
+ss -s				: Summerises all socket stats
+ss -tulnp			: Shows currently lstening ports with program names
+
+ss -t state established
+
+sudo lsof -i :80
+sudo lsof -i :22
+
+------
+
+telnet : telnet is a very helpful tool to verify port status and service status on a remote server. 
+
+windows : We have inbuilt optional feature in windows os. (settings, programs --> Addl features --> telnet client)
+
+sudo dnf install telnet -y
+
+telnet google.com 443
+telnet google.com 80
+
+---
+
+Alternative to telnet
+
+openssl s_client -connect hostname:port-num
+openssl s_client -connect google.com:443
+
+-------
+
+HEREDOC
+
+cat <<EOF > fruits.txt
+apple
+banana
+mango
+orange
+EOF
+
+
+----
+
+"tee" command in Linux OS
+The `echo` command has a limitation. Regular redirection with `echo` will fail whenever we are using `sudo` because our shell is unprivileged. We can use `tee` to overcome this issue. 
+We cannot send the output to multiple files with the `echo` command. 
+
+echo "hello" | sudo tee /etc/test.conf
+
+ls -l | tee test.txt		--> shows output in terminal and saves the output to the file
+ls -l | tee -a test.txt		--> shows output in terminal and appends the new info into the file.
+
+ls -l | tee file1.txt file2.txt		--> sends the output to multiple files
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
