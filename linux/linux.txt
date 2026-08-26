@@ -774,13 +774,113 @@ ls -l | tee -a test.txt		--> shows output in terminal and appends the new info i
 
 ls -l | tee file1.txt file2.txt		--> sends the output to multiple files
 
+================================
+
+D: 26/08/2026
+
+zip <zip.name> <file1.txt> <file2.txt>			--> Zip only selected 2 files
+zip <zip.name> *								--> Zip all files from current location
+zip <zip.name> f*								--> Zip all files from current location name starsts with f
+zip songs.zip songs/							--> Zip all files from songs dir
+zip -e <pwd.zip> <file1.txt> <file2.txt>		--> Zip only selected 2 files with password protection
+zip -r <zipname.zip> /directory-path			--> zip folders recursively
+
+unzip -l alldata.zip							--> Shows the files without unzip
+unzip alldata.zip -d /tmp/						--> unzip to a specific directory
+unzip <zipfolder.zip>
+
+----
+
+tar (tape Archieve)
+
+c - create
+x - unzip
+v - verbose
+z - compress
+f - filename
+
+tar -cvzf mybackup.tar.gz <file1.txt> <file2.txt>		--> zip multiple files
+
+tar -xvzf mybackup.tar.gz 								--> unzip tar file
+tar -xvzf mybackup.tar.gz -C /tmp						--> unzip tar file
+tar -tvzf mybackup.tar.gz 								--> view files from tar file without untar
+
+--------------
+
+find : this `find` command helps us to search the files or directories based on multiple search criteria like name, date created, type, and size of the file. 
+
+sudo find / -name file1.txt			--> Search the entire operating system from / for file1.txt. 
+sudo find / -iname file1.txt		--> Search from / for file1.txt - case insensitive
+sudo find . -name file1.txt			--> Search current location for file1.txt. 
+
+sudo find / -name "*.log"			
+sudo find / -name "error*"			
+
+sudo find /home -type f -name "*.txt"
+sudo find / -type d -name "tmp"
+sudo find / -type d -name "logs"
+
+sudo find /home -type f -empty			--> list empty file
+sudo find /home -type d -empty			--> list empty directories
+
+sudo find / -type f -size +250M			--> identify the files size more than 250 mb
+
+find /path/to/directory -type f -mtime +7 -delete		--> Dont try this
+
+---------------
+
+Copy files from your local laptop to Ec2 instances.
+
+Windows laptop --> Windows Instance ==> Copy & Paste (or) Map local disk
+Windows laptop --> Linux Instance	==> Install WinSCP/Mobaxterm and connect, then copy
+mac OS			-> Windows Instance ==> Copy & Paste (or) Map local disk
+mac OS			-> Linux Instance 	==> use SCP for data transfer
+EC2 Linux		-> EC2 Linux		==> use SCP (Keypair / Password)
 
 
 
+SCP : Secure Copy : SFTP command designed for transferring files between two Linux machines. It uses the SSH protocol. 
 
 
+copy files from local laptop / linux ec2 wit Keypair
+scp -i awar11-na.pem fruits.txt ec2-user@13.203.227.114:/home/ec2-user
 
 
+Copy a entire folder to ec2 instance using password auth
+scp -r ./new/ ec2-user@13.203.227.114:/home/ec2-user
+
+From ec2 instance to local machiene
+scp ec2-user@13.203.227.114:/home/ec2-user/new/server.txt ./
+
+--------------
+
+from local to instance using rsync command - Password:
+rsync -avz ec2.txt ec2-user@13.203.227.114:/home/ec2-user/
+
+from local to instance using rsync command - Keypair:
+rsync -avzP -e "ssh -i awar11-na.pem" ec2.txt ec2-user@13.203.227.114:/home/ec2-user/
+
+--------------
+
+sed : stream editor : stream editor helps us to find and replace the text from a file or find and delete the text "without opening the file". 
+
+
+cat <<EOF > fruits.txt
+apple
+banana
+mango
+orange
+apple juice apple slices
+EOF
+
+
+sed 's/apple/pineapple/' fruits.txt		--> view - Replaces the first occurance apple with pineapple
+sed 's/apple/pineapple/g' fruits.txt	--> view - Replaces the all occurance apple with pineapple
+
+sed -i 's/apple/pineapple/g' fruits.txt		--> Write the changes, replaces apple with pineapple in all occurances
+
+
+sed '/mango/a kiwi' fruits.txt
 
 
 
