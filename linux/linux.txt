@@ -883,6 +883,102 @@ sed -i 's/apple/pineapple/g' fruits.txt		--> Write the changes, replaces apple w
 sed '/mango/a kiwi' fruits.txt
 
 
+=============================
+
+D: 27/08/2026
+
+
+sudo dnf install cronie -y
+sudo systemctl status crond
+sudo systemctl enable crond
+
+crontab -l						: List current users cronjobs
+crontab -e						: Add a cron job for current user
+crontab -r						: Remove the cron job
+
+* * * * * date >> /tmp/user-cron.txt
+
+#! : shebang : OS looks at the 2 bytes for kernel to run script
+/bin/bash : Bash Interpreter binary
+
+#!/bin/bash
+echo "cronjob ran at $(date)" >> /tmp/script-op.txt
+
+chmod +x /home/ec2-user/date.sh
+
+--
+
+Cron for all users :
+
+location: /etc/crontab
+
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+
+* * * * * ec2-user /home/ec2-user/date.sh
+
+@reboot 
+@daily
+
+to get cron job logs: 
+1. sudo dnf install rsyslog -y && sudo systemctl start rsyslog && sudo systemctl enable rsyslog
+2. cron logs stores in : /var/log/cron
+
+
+-----------
+
+In Instance 1 : generate a ssh key
+
+ssh-keygen -t ed25519
+
+grab the public key and copy to instance-2 authorized_keys file in .ssh/authorized_keys
+
+===============
+
+
+HDD : hard Disk Drive : Machanical Drive : uses a spinnind mangenic platters. pointer read and write data.
+
+SSD : Solid State Drive : Flash Drive : Data stores in micro chips like USB.
+* Better performance, less noise
+
+IOPS : input and output Operations per Second
+
+HDD : 75 - 500 IOPS
+SSD : 50k - 10L IOPS
+
+Throughput : Data Transfer rate : Mb/s gb/ps..
+
+Throughput = (IOPS x Data Block Size - KB) / 1024
+
+
+lsblk -o NAME,PHY-SEC
+cat /sys/block/nvme0n1/queue/physical_block_size
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
