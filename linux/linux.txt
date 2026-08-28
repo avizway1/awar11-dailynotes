@@ -963,21 +963,172 @@ lsblk -o NAME,PHY-SEC
 cat /sys/block/nvme0n1/queue/physical_block_size
 
 
+======================
+
+D: 28/08/2026
 
 
+SSD 	: gp2, gp3, io1, io2
+HDD 	: sc1, st1
+Magnetic: Standard
+
+root volume : a root volume is nothing but a volume that contains the operating system. 
+Addl volume : apart from root all other volumes are considered additional volumes. We can use this to store the data. 
+
+root volume : gp2, gp3, io1, io2, standard..
+Addl volume : gp2, gp3, io1, io2, standard, sc1, st1
+
+==========
+
+gp2 and gp3 : general purpose SSD : we use these general-purpose volumes for common workloads. 
+
+gp2 : Min 1 Gb, Max 16 TB.. 1 gb volume gives us 3 IOPS (1:3 ratio), with min of 100 IOPS.. - 16k IOPS
+gp3 : Min 1 Gb, Max 64 TB.. Min 3000 IOPS and Max 80,000 IOPS - We have option to adjust IOPS based on our workload requirements, IOPS cost us.. 
+
+--------
+
+io1 and io2 : Provisioned IOPS : if our workload requires a specific IOPS count, then we can go with the provisioned IOPS option. It costs a bit more compared to all other models but it is the one that gives the best performance among all. 
+
+io1 : min 4 Gb, Max 16 TB.. 1 gb gives 50 IOPS by default
+io2 : Min 4 gb, max 64 TB.. Min 100 IOPS, Max 200000 IOPS
+
+-------
+
+HDD : sc1, st1 : These are HDD volumes, lower performance compared to SSD, but very cheap.. 
+
+st1 / Throughput optimsied HDD : suitable for bigdata, datawarehousing and log processing kind of workload..
+sc1 / cold hdd : same use case as st1, but lower cost with lower performance.. 
+
+Min: 125 GB.. Max: 16 TB.. 
+
+-------
+
+Standard / magnetic : Low cost storage solution.. Min 1 GB.. Max 1 TB.. 
 
 
+=================
+
+file system : a file system is an internal blueprint that organises, stores, and retrieves our data from the volume. Below are the points that a file system performs:
+1. It brings order to the raw storage.
+2. It can track assets.
+3. It finds the free space, writes the content into the space, and maintains the index.
+Whenever we want to open any file, the file system looks at that index and it will fetch
 
 
+Windows : FAT16, FAT32, NTFS, ReFS
+Linux : ext3, ext4, xfs
 
 
+ext3 : Third Extended File system : 
+ext4 : Forth EXtended file system : 
+xfs : eXtended File System : widely used in modern machienes / CLoud.. (effortless scaling with no downtime..  reflink: helpful for cloning volumes.. Huge data handling) 
+
+lsblk
+df -Th
+file -s
+mkfs
+mkdir
+mount
+xfs_growfs
+growpart
 
 
+lsblk : the `lsblk` command is a utility command to display information about all the available storage devices. 
+
+lsblk
+lsblk -pf		: shows volumes full path and file system
+
+full path of the volume: /dev/nvme0n1
+
+df : disk free :
+
+df
+df -Th
+
+df -Th -x tmpfs
 
 
+step 1 : Create a volume in same AZ as our ec2 instance and attach the volume. 
+
+Identify the volume name: lsblk -pf
+New volume path: /dev/nvme1n1
+
+step 2 : Verify the new volume has any file system
+
+sudo file -s /dev/nvme1n1
+
+output: data		: No file system
+
+step 3 : Write a file system to the new volume
+
+sudo mkfs -t xfs /dev/nvme1n1
+
+sudo file -s /dev/nvme1n1
+lsblk -pf
 
 
+step 4 : mount the volume to directory
 
+cd /mnt/
+sudo mkdir nowvol
+
+sudo mount /dev/nvme1n1 /mnt/nowvol
+
+----
+
+step 5 : make the mount persistent, that can survive reboot / stop and start of ec2 instance..
+
+cat /etc/mtab | grep nvme1n1
+
+/dev/nvme1n1 /mnt/nowvol xfs rw,seclabel,relatime,inode64,logbufs=8,logbsize=32k,sunit=8,swidth=8,noquota 0 0
+
+write above entry into /etc/fstab file
+
+sudo vim /etc/fstab
+
+save and quit
+
+mount -a
+mount -all
+
+----
+
+To increase existing volume size
+1. We first have to increase the volume size in the AWS console.
+2. We need to perform operations at the OS level.
+
+sudo xfs_growfs -d /mnt/nowvol
+
+-----
+
+To increase the root volume size:
+1. We first have to increase the volume size in the AWS console.
+2. Root volume mounted to a partition so we need to use the `growpart` command.
+
+sudo growpart /dev/nvme0n1 1
+
+We need to reboot instance.. 
+
+----
+
+If you use aws volume copy feature, if you attach volume to same instance, We get same UUID as existing volume. THis need to be regenerated.
+
+--> If we are attaching to another instance, we dont see this issue. 
+
+sudo xfs_admin -U generate /dev/nvme2n1
+
+sudo mount /dev/nvme2n1 /mnt/volclone
+
+
+---
+
+1. Safely remove entry from /etc/fstab file
+
+2. unmount
+sudo umount /mnt/nowvol
+sudo umount /dev/nvme1n1
+
+---
 
 
 
