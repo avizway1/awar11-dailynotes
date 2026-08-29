@@ -316,31 +316,84 @@ Putty dont support .pem, so we need to conmvert .pem to .ppk using "puttygen"
 
 Option 7 : 3rd party tool named: mobaXterm
 
-------------
+
+========================================================================================
+
+
+D: 29/08/2026
+
+An EBS snapshot is basically a point-in-time incremental "backup of an EBS (Amazon Elastic Block Store) volume". 
+
+Can I see what files we have inside a snapshot? 
+Answer:  NO. If you want to see the files, you create a volume attached to any of the instances, then only we can view the files. 
+
+
+Q: we have an existing unencrypted EBS volume. How will you convert it to an encrypted one? 
+Ans: we don't have a direct option to modify an EBS volume and enable encryption. There is no direct setting. We have a workaround:
+1. We need to create a snapshot of an unencrypted EBS volume.
+2. We can create a volume from the snapshot.
+3. While we are creating the volume we do have an option to enable encryption.
+4. Once we have created a volume with encryption enabled, we can attach this volume to an existing instance and we can detach the old one.
+5. Once data verification, validation, and basic sanity checks are completed, we can delete the old unencrypted volume.
 
 
 
 
+/dev/nvme1n1
+
+sudo file -s /dev/nvme1n1
+
+sudo mkfs -t xfs /dev/nvme1n1
+
+sudo mkdir newvol
+
+sudo mount /dev/nvme1n1 /mnt/newvol
+
+cat /etc/mtab | grep nvme1n1
+
+/dev/nvme1n1 /mnt/newvol xfs rw,seclabel,relatime,inode64,logbufs=8,logbsize=32k,sunit=8,swidth=8,noquota 0 0
+
+sudo vim /etc/fstab
 
 
+Q: we have an EC2 instance in AP South 1a. It has a volume with a lot of data. We need the entire data for another EC2 instance in another availability zone or the instance may be in another region. What is the process? 
+Ans: as both EC2 instances are in different availability zones or different regions, we don't have a direct option to detach and attach. We cannot even use the copy volume option as they are in different regions.
+1. We have to create a snapshot.
+2. We have to create a volume from the snapshot.
+3. If another instance is in the same region but another availability zone, we need to create the volume from the snapshot. If another instance is in another region, we need to copy the snapshot.
+4. We need to create the volume.
+5. We can attach it to the instance.
+
+=================
+
+RTO : Recovery Time Objective : 
+Question : How long we can be offline. / How much downtime offord.
+Meaning: Downtime limit
+Focus: Recovery speed
+Example : if our RTO is 4 hours, we must have our systems up and running with in 4 hours. 
 
 
+RPO : Recovery Point Objective : 
+Question : How much data loss we can afford.?
+Meaning: Data loss limit
+Focus: Backup frequency
+Example: If our RPO is set to 4 Hr, you must have backup configured for every 4 Hr.
 
 
+DLM : Data Lifecycle Manager : 
+
+We don't have any option to directly pick the volume or instance. We have to choose tags for filtering the resources. 
+
+We do have an option to filter resources and create backups by using an instance-level tag or an individual volume-level tag. 
 
 
+Q: explain your EC2 instances' backup strategy. 
+Ans: we are using the AWS DLM (Data Lifecycle Manager) service to take backups of our EBS volumes. We are not using any third-party applications. We have a compliance standard: for every resource we create in EC2 we must add an environment tag. We are using that environment tag to filter the resources with DLM. For example whenever we are configuring it in the production environment as per our requirement, we have configured a backup frequency of every 4 hours. We also have a retention policy: we are retaining resources for 4 days in the production environment and 2 days in the non-production environment. 
 
-
-
-
-
-
-
-
-
-
-
-
+Service.?
+Resource Filter.?
+Frequently.?
+Retention.?
 
 
 
