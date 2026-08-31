@@ -395,12 +395,60 @@ Resource Filter.?
 Frequently.?
 Retention.?
 
+============================================================
+
+D: 31/08/2026
+
+Requirement : we need 10 EC2 instances with some customizations. Based on our organisational requirements all the EC2 instances should have some standard applications or software. We want to have all those in the 10 EC2 instances we are going to launch. 
+
+--> Custom user creation with username, password
+--> Packages : tree, httpd, telnet
+--> Addl EBS Volume
+--> OS hardening
+
+Option 1 : Lanch 10 instance and install/configure 10 instances. (activity x 10)
+Option 2 : Launch 1 instance and configure everything, Then create a goldenAMI, then launch n number of the instance.  (activity x 1)
 
 
+OS Hardening : it's a cybersecurity process of securing an operating system by reducing the attack surface. 
+By default a lot of operating systems come with a lot of broader settings. We have to narrow down those default settings:
+- We can remove preinstalled software.
+- We can close some ports.
+- We can disable some of the service accounts.
+- Enforcing leasy privulages mechanism
+- Disabling unused ports and services
+- Enfoircing password complexity, Restrict root user access
+- Installing auditing softwares (rsyslog, auditd)
+
+CIS or Lynis can help us to identify the areas we need to focus.
 
 
+checklist: 
+1. Need custom user with pwd, sudo permisisons : yes
+2. Install packages : telnet, tree, httpd : yes
+3. addl volume, perm mount : yes
 
+---
 
+Instance Termination Protection : to protect our instances from accidental terminations 
+
+Instance Stop Protection : to protect our instances from accidental stops 
+
+If you want to terminate an EC2 instance, termination protection and stop protection must be off. Only then can we terminate the instance. 
+
+Shutdown behaviour : what should happen to our EC2 instance when we initialise a shutdown of the operating system from the OS level? 
+We have two options: (This will have the highest priority. It will override instance stop and termination productions.)
+1. Stop
+2. Terminate
+
+---
+
+EIP : Elastic IP : it's a dedicated public IP address for our EC2 instance.
+
+In general if we perform a stop and start operation, the instance will get a new public IP address. To have a fixed generated elastic IP address, then attach it. 
+
+reboot : Pubic ip wont change
+stop and start : public ip will change
 
 
 
