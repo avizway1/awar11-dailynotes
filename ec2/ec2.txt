@@ -517,13 +517,102 @@ sudo dnf install httpd -y
 sudo systemctl enable httpd --now
 echo "<h1>This is my userdata website</h1>" >> /var/www/html/index.html
 
+============================================
+
+D: 02/09/2026
+
+https://aws.amazon.com/cli/
+
+aws --version
+
+aws configure
+
+Never store your access key in plain text, in a code repository, or in code.
+Disable or delete access keys when no longer needed.
+Enable least-privilege permissions.
+Rotate access keys regularly.
 
 
+aws configure							==> Profile: default
+AccessKeyID: 
+SecretAccesskey:
+Default Region : ap-south-1
+Default Output format: json/table/text/none
 
 
+Above configuration stores in plain text format in our laptop.. 
+
+c:/users/administrator/.aws
+
+mac: cd ~
 
 
+--dry 		: This performs a command simulation not actual execution. It's best practise to run it before the actual execution. 
 
+--debug		: This helps us to identify the issue with respect to the connectivity or the permissions. This displays everything happening in the backend. 
+
+
+sts : Security Token Service : this service generally helps to issue temporary tokens when we are using AWS CLI or login. 
+
+
+aws sts get-caller-identity				: Displays as what user you are working
+
+
+any command syntax: 
+
+aws <service-name> <command> <arguments>
+
+
+aws ec2 describe-instances --region ap-south-1
+
+aws ec2 start-instances --instance-ids i-0293be105f083b1b7 --region ap-south-1
+
+aws ec2 stop-instances --instance-ids i-0293be105f083b1b7 --region ap-south-1
+
+---------
+
+profile : this feature helps us to access multiple AWS environments from one device. 
+
+aws configure --profile dev
+
+AccessKeyID: 
+SecretAccesskey:
+Default Region : ap-south-1
+Default Output format: 
+
+aws configure --profile uat
+aws configure --profile prd
+
+----------
+
+Problem with AWS CONFIGURE : credentials are going to be stored in plain text format on our laptop. These credentials won't rotate automatically. We manually need to rotate them. There is a high chance of getting this stolen. 
+
+=======================================
+
+aws login : this is a newer and recommended way to access AWS environments. The advantage is temporary credentials. 
+
+Pre-Requisite: make sure the user who want to use this feature, should have a policy
+PolicyName: SignInLocalDevelopmentAccess
+
+Session duration: 12 hours
+Temp token expiration : 15 Min
+
+AWS login stores temp token : "~/.aws/login/cache/xxxx.json" with expiration period.
+
+---
+
+if you have any machiene without UI/browser, you can use: 
+
+aws login --remote
+
+aws login --profile dev
+aws login --profile uat
+
+=======================================
+
+Try switch role option..
+
+======================================
 
 
 
