@@ -1,0 +1,62 @@
+{
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "root",
+    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+    "debug": false
+  },
+  "logs": {
+    "force_flush_interval": 15,
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/httpd/access_log",
+            "log_group_name": "/aws/ec2/httpd/access",
+            "log_stream_name": "{instance_id}",
+            "log_group_class": "STANDARD",
+            "retention_in_days": 7,
+            "timestamp_format": "%d/%b/%Y:%H:%M:%S %z",
+            "timezone": "UTC"
+          },
+          {
+            "file_path": "/var/log/httpd/error_log",
+            "log_group_name": "/aws/ec2/httpd/error",
+            "log_stream_name": "{instance_id}",
+            "log_group_class": "STANDARD",
+            "retention_in_days": 14,
+            "multi_line_start_pattern": "\\[\\w{3} \\w{3} \\d{2} ",
+            "timezone": "UTC"
+          }
+        ]
+      }
+    }
+  },
+  "metrics": {
+    "namespace": "CWAgent",
+    "append_dimensions": {
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}",
+      "ImageId": "${aws:ImageId}"
+    },
+    "aggregation_dimensions": [["InstanceId"], []],
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          { "name": "mem_used_percent", "rename": "MemoryUsedPercent", "unit": "Percent" },
+          { "name": "mem_available_percent", "rename": "MemoryAvailablePercent", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60
+      },
+      "disk": {
+        "resources": ["/"],
+        "ignore_file_system_types": ["sysfs", "devtmpfs", "tmpfs", "overlay", "squashfs"],
+        "drop_device": true,
+        "measurement": [
+          { "name": "used_percent", "rename": "DiskUsedPercent", "unit": "Percent" }
+        ],
+        "metrics_collection_interval": 60
+      }
+    }
+  }
+}

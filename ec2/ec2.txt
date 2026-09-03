@@ -614,6 +614,89 @@ Try switch role option..
 
 ======================================
 
+D: 03/09/3036
+
+Monitoring : cloudWatch service will monitor our AWS resources. 
+o11y : observability : SRE : so it can look into the logs, it can identify the issue, it can verify the traces, and it can alert the user. 
+
+By default CloudWatch will provide metrics for the below resources:
+- CPU
+- network in and out
+- disc read and write operations
+- status checks
+
+CloudWatch default metrics have a limitation: they cannot monitor the following resources:
+- memory/RAM metrics
+- disc metrics
+- custom application
+
+CloudWatch has two types of monitoring:
+1. Basic monitoring : monitoring or graph update interval is 5 minutes. 
+2. Detailed monitoring : monitoring interval will reduce to 1 minute. It will cost us. Also, We don't get any additional graphs. 
+
+lets add load on our ec2 instance
+
+cpu load: stress --cpu 2 --timeout 120
+memory load : stress --vm 2 --vm-bytes 512M --timeout 120
+
+Alarm Creation: 
+Metric : CPU Usage, Network, Disk usage, Memory
+Threshold : TIme period : CPU usage is exceeding its % of usage for a period  (5 min or 15 min..)
+Action : Do you want to perform any activity automatically (stop / reboot / terminate / recorvery).. 
+Notification : We can send Email alerts using SNS (Simple Notification Service).. 
+
+---------
+
+Dashboard : I have multiple resources for a project. I want to monitor all those resources from a centralised location then we can create a dashboard. We can pick the required metrics from multiple resources, like:
+- EC2 instance CPU
+- S3 bucket size
+- S3 bucket object count
+- database CPU usage
+- database memory usage
+
+--> We do have an option to share this dashboard securely with a username and password or we can even make it public. 
+
+---------
+
+Step 1 : Create an IAM role and attach role to ec2 instance. Make sure role has below policies.. 
+- CloudWatchAgentServerPolicy
+- AmazonSSMManagedInstanceCore
+
+Step 2 : Install apache / nginx
+
+sudo dnf install httpd -y
+sudo systemctl enable httpd --now
+sudo systemctl status httpd 
+cd /var/www/html/
+sudo vim index.html
+
+Application Logs location:
+
+/var/log/httpd/access_log
+/var/log/httpd/error_log
+
+
+Step 3 : Install cloudwatch agent
+sudo dnf install amazon-cloudwatch-agent -y
+
+
+Step 4 : Configure the agent
+
+4.1 cloudwatch look for configuration file in below location. file name should be "config.json"
+/opt/aws/amazon-cloudwatch-agent/bin
+
+4.2 refer the config file and create a file in the path with name config.json
+
+4.3 Inform cloudwatch agent to fetch config from ec2 local.
+
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:///opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+
+sudo systemctl enable amazon-cloudwatch-agent --now
+
+sudo ./amazon-cloudwatch-agent-ctl -a status
+
+
+
 
 
 
