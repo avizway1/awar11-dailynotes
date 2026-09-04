@@ -4,7 +4,7 @@
 
 # a page nobody can read  -> 403
 echo secret > /var/www/html/secret.html
-chmod 000 /var/www/html/secret.html
+chmod 755 /var/www/html/secret.html
 
 # a CGI that fails -> 500, and its stderr becomes an ERROR line in error_log
 mkdir -p /var/www/cgi-bin

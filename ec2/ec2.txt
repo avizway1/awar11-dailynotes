@@ -696,6 +696,113 @@ sudo systemctl enable amazon-cloudwatch-agent --now
 sudo ./amazon-cloudwatch-agent-ctl -a status
 
 
+==================================
+http status codes:
+
+2xx	: ok/success
+3xx	: redirection
+4xx	: Client side error
+5xx	: Server side error
+
+
+Interview: see how you can monitor EC2 instance custom metrics like memory utilisation and disc utilisation. When disc usage is a bit low, how can we send alerts? 
+Also, we have an application running inside an ACI instance. That application is generating a lot of errors so we need to track those errors, identify the error, and whenever the errors are generated a bit more for a particular period, we should get an alert. How can we design the solution? 
+
+====================================
+
+EventBridge: Event Bridge is a serverless fully managed event bus service that enables us to perform two kinds of processes:
+1. Event-driven processes
+2. Scheduled processes
+
+EventDriven Processes: 
+- When an EC2 instance is stopped, get a notification.
+- When a user deleted a user or created a user, get an alert.
+- When an object is uploaded to an S3 bucket, invoke a Lambda function that can start subsequent processes.
+
+Scheduled Processes: 
+- Every day at 8 am, start an EC2 instance.
+- Every day at 6 pm, stop the same EC2 instance.
+- Every 10 minutes, invoke a Lambda function that can process a batch job.
+
+
+Event: it describes the change in state and an event will be generated in JSON format. 
+EventBus: the channel through which the event actually flows. we have i.e; default, custom, partner. 
+Rule: defines which events to match and where to send them. 
+
+
+Input Transformer: reshape the event before it is sent to the target. 
+Input Path: You pick desired info
+Input Template: Use Input Path info and build your own message.
+
+---
+
+Requirement 1 : whenever an EC2 instance changes its state to stopped or stopping, send an alert to an SNS topic. 
+
+Event Pattern:
+{
+  "source": ["aws.ec2"],
+  "detail-type": ["EC2 Instance State-change Notification"],
+  "detail": {
+    "state": ["stopping", "stopped", "terminated"],
+    "instance-id": ["i-02883352bd206aa06"]
+  }
+}
+
+
+event:
+
+{
+  "version": "0",
+  "id": "a80d7ff6-8e1c-a1c1-dff7-fe7ad9745f24",
+  "detail-type": "EC2 Instance State-change Notification",
+  "source": "aws.ec2",
+  "account": "992189742322",
+  "time": "2026-09-04T02:34:59Z",
+  "region": "ap-south-1",
+  "resources": [
+    "arn:aws:ec2:ap-south-1:992189742322:instance/i-02883352bd206aa06"
+  ],
+  "detail": {
+    "instance-id": "i-02883352bd206aa06",
+    "state": "stopped"
+  }
+}
+
+
+Input Path:
+
+{
+  "instance-id": "$.detail.instance-id",
+  "state": "$.detail.state",
+  "region": "$.region",
+  "account": "$.account",
+  "time": "$.time"
+
+}
+
+
+Input Template:
+
+"At <time>, In my account: <account>. \nAn ec2 instance <instance-id> in <region> region is changed its state to <state>"
+
+
+----
+
+When anyone opens port 22 or 3389 anywhere, we should send an alert immediately. 
+
+When anyone modifies an existing policy send an alert. 
+
+When anyone makes any S3 bucket public, we should get an alert immediately. (optional)
+
+---
+
+
+
+
+
+
+
+
 
 
 
