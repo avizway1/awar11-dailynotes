@@ -794,15 +794,31 @@ When anyone modifies an existing policy send an alert.
 
 When anyone makes any S3 bucket public, we should get an alert immediately. (optional)
 
+=======================================================================================
+
+D: 07/09/2026
+
+
+Systems Manager : *CloudOps Exam Important Topic..
+
+If you want to manage any EC2 instance using Systems Manager, we should add this policy to the instance attached to the IAM role: "AmazonSSMManagedInstanceCore"
+
+
+configmap (k8s) : less sensitive information	: Parameter store : Static/Fixed
+Secrets (k8s) : More sensitive info				: Secrets Manager
+
+Secrets Manager: THis cred can be rotated automatically periodically.
+
+
 ---
 
+Cluster PG : packs instances close together on the same physical rack within a single availability zone. We can use this for tightly coupled applications for ultra-low latency and high network throughput. 
 
+Partition PG : divides the instances into logical partitions. Instances in one partition will not share hardware with instances in another partition. We get fault isolation at the partition level. 
 
+Spread PG : strictly separates each individual instance into its own physical hardware rack, power connectivity, and network paths. A small group of critical servers we can launch in a spread placement group. We get maximum fault tolerance here.  
 
-
-
-
-
+==============
 
 
 
