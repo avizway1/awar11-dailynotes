@@ -1,0 +1,93 @@
+
+
+Vertical scaling : 
+-----------------
+
+Upgrading resources on a single server. Whenever the currently configured configuration is not able to handle the load, we can add more resources or we can remove resources. 
+--> Simplicity: There is no need to change our application code, centralised storage, or managing multiple clusters. You simply change the instance type to better or higher-configuration hardware. 
+--> The hardware ceiling : At the end of the day we will hit the maximum possible configuration offered by the service provider. 
+--> If our workload is running only in one availability zone, if something happened to that particular availability zone, our application is going to be down. 
+
+** AWS : we cannot perform vertical scaling without stopping our EC2 instance. 
+
+
+--> Metrics, Logs, Alarms
+--> Internally discuss with team and feedback
+--> CRQ (Change Request)
+--> CAB (Change Advisory Board) - NonProd-2 Times a week.. 
+--> NON-Prod CRQ CAB Meeting : Budget..?  DOWNTIME REQUEST.? Client Facing..? Client Communicated.? Rollbackplan.?
+Implementation steps.? (Pre-Implementation and Post Implementation).. Teams involved.? Task creted for involved team.? Validation.? Windows.?? 
+--> NonProd-CRQ will be approved
+
+2 WEEKS OBSERVATION
+
+--> CAB (Change Advisory Board) - Prod - 1 time.. 
+--> PROD CRQ CAB Meeting : IS NON-PROD IMPLEMENTED.?? CRQ ID..?? Budget..?  Downtime.? Client Facing..? CLient Communicated.? Rollbackplan.?
+Implementation steps.? (Pre-Implementation and Post Implementation).. Teams involved.? Task creted for involved team.? Validation.? Windows.??
+--> PROD-CRQ will be approved
+
+
+SDLC : Dev --> QA --> SIT --> UAT --> PRD
+
+
+
+
+Horizontal scaling :
+--------------------
+Adding more individual servers has the flexibility that we can add an infinite number of servers to deliver the same kind of workload and we will get very high fault tolerance. 
+
+--> High Availability : we can distribute our application across multiple servers. This means our system remains resilient during a single hardware failure or multiple hardware failures, or during traffic spikes. 
+--> We must create a load balancer to route the traffic across multiple servers. As multiple servers are delivering the same kind of application, it needs a single point of contact. 
+
+ELB : Elastic Load Balancer
+
+--> CLB : Classic Load Balancer : Outdated, AWS Stopped supporting
+--> ALB : Application LB :  Layer 7 LB : 
+--> NLB : Network LB : Layer 4 LB : 
+
+
+TCP/IP Layers:  7 layers
+
+Application : Http, https.. This is a place where our actual application lives. (L7)
+
+Presentation : TLS/SSL, ASCII, Data Encryption.. 
+
+Session Layers : Opens and manages the connections
+
+Transport layers (L4) : TCP, UDP, TLS..  it moves the data between applications using port numbers and IP addresses. TCP guarantees the order and delivery so network load balancer routing happens at this layer. 
+
+Network Layers : IP/ICMP : Finds the path from one network to another using IP Address. 
+
+Data Link : MAC/Switches/Routers: node to node routing across the network by using MAC ID 
+
+Physical Layer : cable/fibre: ones and zeros are electrical, light, or radio signals. It will use cables, fibres, Wi-Fi, and radio signals, hubs, and it will prepare and take the raw bit signal and convert it to the signals.  
+
+====================
+
+--> ALB : Application LB :  Layer 7 LB :  http, https : Path, Host Based routing, httpd headers.. latency compared to NLB.. No static IP..
+
+--> NLB : Network LB : Layer 4 LB : TCP, UDP : Capable of handling millions of req per second with ultra low latency.. less latency compared to ALB..
+
+===================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
