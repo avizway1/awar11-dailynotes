@@ -70,19 +70,106 @@ Physical Layer : cable/fibre: ones and zeros are electrical, light, or radio sig
 
 ===================
 
+D: 09/09/2026
+
+LoadBalancer designed to deliver the output to the entire world. 
+
+Question: Should my EC2 instance also deliver web content to everyone with Direct Instance IP? 
+
+Adjust your EC2 instance's security group:  Open ports 80 and 8080 to the load balancer's security group so only the load balancer can access the web content from the EC2 instance. 
+
+If anyone directly tries to access the EC2 instance, it won't deliver the web content. 
+
+----
+
+WebServer-SG
+
+http: 80 : ELB-SG
+https: 443  : ELB-SG
+c http: 8080 : ELB-SG
+
+ELB_SG:
+
+http: 80 : 0.0.0.0/0
+https: 443  : 0.0.0.0/0
+c http: 8080 : 0.0.0.0/0
+
+=======================
+
+Target Group: Combination/Group of multiple EC2 instances that are running on the same port and delivering the same application.
+
+Target registration:
+1. Instance: EC2 instances will register with the target group by using instance ID.
+2. IP address: Instances register with the target group by using private IP address. We have an advantage whenever we are using IP address. If our architecture is hybrid we can add on-premises servers also using IP.
 
 
+Interviewer: In the target group your EC2 instance is showing its status as unhealthy. How will you troubleshoot? 
+1. Verify whether the instance is in a running state or not.
+2. Verify whether the instance's security group requires the port to be open or not.
+3. Verify the health check path we configured at the target group level.
+4. Whether the application is really running inside the EC2 instance and configured on the same port.
+5. Verify the load balancer's subnet status and whether your EC2 instance is running.
+
+** There is no need to have the same port at the target group and listener levels. Your application can be on port number 80 and you can configure the listener on 88 at the load balancer level and redirect the traffic. 
+
+** One instance can be a member of multiple target groups. 
 
 
+Application LB : 
+nslookup myapp-alb-462562902.ap-south-1.elb.amazonaws.com
+13.203.175.107
+3.111.108.126
+
+** These IP addresses are not static or fixed. They may change. 
+
+---
+
+Network LoadBalancer has an advantage to have a static IP. We can generate elastic IP addresses we can associate with the network load balancer. 
+
+nslookup myapp-nlb-1aeb56837c7871f8.elb.ap-south-1.amazonaws.com
+43.204.65.36
+13.235.203.177
+
+----
+
+ALB Supported Algorithms: 
+
+round-robin algorithm : appication load balancer defaults to the nested round-robin algorithm. This is the default algorithm and traffic is routed in a cycle across all the instances. 
+
+least outstanding request : a load balancer evaluates the existing instances and existing requests and when a new request comes, it will decide where it has to go based on the load. 
+
+Weighted Random : this algorithm uses anomaly mitigation to identify HTTP status codes and connection errors. Based on those errors it will route the traffic intelligently. 
+
+----
+
+NLB Supported Algorithms: a network load balancer works with the flow hash algorithm. It will use the following as ingredients:
+- source IP (who sends it)
+- source port
+- destination IP address (the network load balancer's public IP address)
+- destination port (80 or 443)
+- protocol (TCP or UDP)
+It will read the above information, then it will prepare a hashing, then it will send the request to the target. 
+
+----
+
+We can enable stickiness on the application load balancer so it will stick the session to that particular instance or web server till the sticky session validity completes. 
+
+---
+
+We need to have a fixed IP address for our application load balancer delivering an application which is running on an HTTP port. 
+
+1. Reconfigure your entire application to support the TCP protocol and configure a network load balancer. Attach a static IP to your client. 
+
+2. Take the entire "application load balancer" and attach it to a "network load balancer" as a "target". Make sure the network load balancer has a static IP.
 
 
+---
 
+An application load balancer works better with a containerized or microservice-based workload as it supports host-based, path-based routing. 
 
+A network load balancer works for large-scale request handling. It can support millions of requests per second while maintaining ultra-low latency. 
 
-
-
-
-
+---
 
 
 
