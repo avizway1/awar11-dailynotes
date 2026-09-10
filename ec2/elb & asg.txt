@@ -171,6 +171,81 @@ A network load balancer works for large-scale request handling. It can support m
 
 ---
 
+D: 10/09/2026
+
+
+Prerequisites:
+
+1. Create an EFS and Mount it to the base instance.
+2. Launch an ec2 instance and perform the required changes including thr EFS mount (Step 1 EFS).
+3. Create a GoldenAMI from the instance we prepared in Step-2.
+4. Create a Launch template (AMI - step3, Keypair, Instance Type, SG, Volume) and define the settings you need for the instances running with ASG. (DONT INCLUDE SUBNETS)
+5. Create Target group (Dont add any instances)
+6. Crete a Load Balancer
+7. Create an ASG
+
+
+Business 2 Business : we can easily predict the load so that we can configure our application to run with a specific desired count. 
+
+
+Cloudwatch Alarm : 
+
+Simple Scaling Policy:
+ASG Instances CPU Usage >=80 --> Desired Count to 10
+ASG Instances CPU Usage <=20 --> Desired Count to 1
+
+Step Scaling: 
+ASG Instances CPU Usage below 10% --> Desired Count to 1
+ASG Instances CPU Usage between 10 to 20% --> Desired Count to 2
+ASG Instances CPU Usage between 20 to 60% --> Desired Count to 3
+ASG Instances CPU Usage between 60 to 80% --> Desired Count to 6
+ASG Instances CPU Usage 80% above --> Desired Count to 10
+
+Target Scaling Policy: **
+We can define the average CPU utilisation required for our EC2 instances.  Avg 70%.. 
+
+Scheduled Scaling Policy: 
+Scaling activity happened during the only defined window. We can configure with cron format as well. 
+
+----
+
+1. SG Configuration;
+
+ELB-SG - http, https - 0.0.0.0/0
+WebServer-SG - http, https - ELB-SG
+EFS-SG - NFS - 2049 - WebServer-SG
+
+
+2. Create EFS
+
+3. launch ec2 instance and make it as webserver, mount efs and make it perm moount.. Setup user passwords and configure addl users..
+reboot and validate all the changes
+
+4. Create a GoldenAMI
+
+5. Create a launch template
+
+6. Create a TG and LoadBalancer. Dont add any ec2 instances. 
+
+7. Create ASG
+
+
+Balanced best Effort : if launching an EC2 instance fails in one availability zone, an auto-scaling group will attempt to launch in another availability zone. 
+
+Balanced Only : if launching an EC2 instance fails in one availability zone, an auto-scaling group will continue reattempting to launch instances in the same availability zone to preserve balanced distribution across AZs.
+
+ 
+Manual Scaling : manually we can adjust the desired capacity so that the auto-scaling group will add or remove EC2 instances based on the value we define. 
+
+
+
+
+
+
+
+
+
+
 
 
 
