@@ -234,12 +234,25 @@ Balanced best Effort : if launching an EC2 instance fails in one availability zo
 
 Balanced Only : if launching an EC2 instance fails in one availability zone, an auto-scaling group will continue reattempting to launch instances in the same availability zone to preserve balanced distribution across AZs.
 
- 
+--
+
 Manual Scaling : manually we can adjust the desired capacity so that the auto-scaling group will add or remove EC2 instances based on the value we define. 
 
+---
 
+Automatic Scaling : 
 
+Simple Scaling : 
 
+Step Scaling : 
+
+Target Tracking Scaling : 
+
+---
+
+Health check grace period: The time the auto-scaling group waits before checking the health of a newly launched instance. This helps us to prevent prematurely killing an instance that is still warming up or completing the boot process or boot scripts. 
+
+Cooldown period: it prevents the auto-scaling group from launching or terminating a new instance while waiting for the previous scaling activity to take effect. 
 
 
 
