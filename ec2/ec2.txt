@@ -820,6 +820,70 @@ Spread PG : strictly separates each individual instance into its own physical ha
 
 ==============
 
+D: 12/09/2026
+
+Instance store volumes:  are also called ephemeral storage. Our EC2 instance is going to use the underlying host's storage. 
+We have disadvantages with instance store volumes. 
+--> Due to any reason if our EC2 instance is stopped and started, we will lose all the data. 
+--> For the reboot operation we are not going to lose all the data. 
+--> That is why we don't prefer to run our workload with instance store volumes. 
+
+We always use "EBS volumes" over instance store volumes. 
+
+----
+
+Hypervisor : ESX-i, Hyper-v, KVM, XEN, Nitro... 
+
+Type 1 : Bare-Metal Hypervisor.. : EC2
+It installs directly on the physical server's hardware and acts as a lightweight operating system itself. This offers maximum speed and efficiency because there is no intermediate operating system layer. At the enterprise level we use this. 
+
+
+Type 2 : Hosted Hypervisor.. It runs as a regular software application on top of our host operating system, like Windows, Mac OS, or any Linux. It has slightly lower performance because all requests have to pass through the host operating system first. We can use this on our personal laptops for our local developments. 
+
+OracleVM VirtualBox, VMWare Workstation...
+
+
+---
+
+FedRAMP : Federal Risk and Authorization Management Program
+PCI DSS : Payment Card Industry Data Security Standard 
+HIPAA : Health Insurance Portability and Accountability Act  (PHI : Protected health information.)
+GDPR : General Data Protection Regulation 
+
+---
+
+Tenancy Options in ec2: 
+
+Share tenancy:  Underlying hardware will be shared with multiple customers. This comes at a low cost.
+
+Dedicated Tenancy : underlying hardware will be allocated to one customer only and will not be shared with any other customer. 
+
+1. Dedicated Instance : we get an individual instance, small in terms of size compared to the host. 
+2. Dedicated Host : we can run multiple instances on a host. We will get an option to apply licences to underlying instances, sockets, or hardware. 
+
+---
+
+Status checks on EC2 Instances : 
+
+1. System Status check : system status check monitors the underlying physical host and its power and network connectivity. 
+--> To fix this issue simply perform a stop and start on the instance so the instance will move or look for another healthy host. 
+
+2. Instance Status check : Instance status check monitors the underlying operating system, network configurations, and kernel configurations of the instance. 
+--> To fix this issue:
+1. Reboot the instance.
+2. Check system logs.
+3. Look for configuration errors.
+4. If you have any most recent backup copy of the root volume, perform "replace root volume".
+
+3. EBS Status checks : check the EBS volume status and look for connectivity issues between EC2 instances and EBS volumes. 
+
+4. Application Status Check : newly introduced one: we can configure status checks for an application running inside our EC2 instance. We can define a custom health check path. If the service is not running, the application is not delivering and it fails. 
+
+---
+
+NIC : Network interface Card : a connector that establishes connectivity to the external world either by using a wired method with RJ45 or a wireless method with Wi-Fi 802.11 b/g/n. 
+
+ENI : Elastic Network Interface : NIC card for our ec2 instance.. 
 
 
 
