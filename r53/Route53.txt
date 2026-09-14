@@ -1,0 +1,66 @@
+
+
+DNS : Domain Name System : 
+
+DNS translates human-readable domain names into numerical IP addresses. (google.com --> 142.251.222.164)
+All the computers or the servers or any device communicate using numbers. DNS acts as a phone book of the internet, mapping easily rememberable names to the machine-readable web server IP address that changes based on multiple factors. 
+
+laptop --> local cache check (browser / OS) --> Recursive resolver (ISP / google DNS / Cloudflair) --> root Name Servers --> TLD (Top level Domain Servers) (.com, .org) --> Authoritative Name Servers (stores official master records configured by domain owner) 
+
+A Record : Address Record : it maps the domain name to its IP address and vice versa for IPv4. 
+AAAA Record : Address Record : it maps the domain name to its IP address and vice versa for IPv6.
+CNAME Record : Cananical Name : forwards domain name to an alias or subdomain name.
+MX Record : Mail Exchanger : ROutes incoming emails to the mail servers by hosting email systems.
+TXT Record : Text record : to prove ownership of our domain we create this TXT record. It contains arbitrary text data. 
+
+Alias Record : this is an intelligent record, available only in the AWS environment so it can identify the resource changes and we can easily fetch the resources to map with A Record. 
+
+---
+
+ICANN : internet Corporation for Assigned Names and Numbers: This is a governing body for global internet policies. 
+
+IANA : Internet Assigned Numbers Authority : Maintains unique identifiers and rootzonedb. 
+
+---
+
+.ai domain : Anguilla
+
+---
+
+Domain Registrer : GoDaddy, BigRock, Namechap, Hostinger, aws, google dns.. 
+
+---
+
+AWS DNS Service Name: Route53 (DNS port Number : 53)
+
+---
+
+Create a HostedZone in AWS r53 with Domain name as HostedZone Name.
+
+HostedZone Name = Domain Name
+
+---
+
+Step 1 : create a domain name at any domain registrar like GoDaddy, BigRock, Namecheap, or Hostinger. 
+
+Step 2 : create a hosted zone in AWS Route53 with the same name. 
+
+Step 3 : grab the four name servers we get when we create a hosted zone. We need to configure this at the domain registrar. 
+
+ns-1660.awsdns-15.co.uk
+ns-666.awsdns-19.net
+ns-1156.awsdns-16.org
+ns-393.awsdns-49.com
+
+These name server changes will take at least 24 hours whenever you perform this operation for the first time. 
+
+----
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,100 @@
+
+Pre-Requisites:
+Create A record for your domain with Instance IP Address.. 
+
+awswithavinashreddy.com
+www.awswithavinashreddy.com
+
+
+Verify output with nslookup.. It should resolve to ec2 instance IP Address..
+
+
+sudo dnf install -y certbot mod_ssl python3-certbot-apache
+
+Create a configuration file first..
+
+sudo vim /etc/httpd/conf.d/awswithavinashreddy.conf
+
+
+---
+
+<VirtualHost *:80>
+    ServerName awswithavinashreddy.com
+    ServerAlias www.awswithavinashreddy.com
+    DocumentRoot /var/www/html
+    
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog /var/log/httpd/awswithavinash-error.log
+    CustomLog /var/log/httpd/awswithavinash-access.log combined
+</VirtualHost>
+
+-----
+
+sudo systemctl restart httpd
+
+sudo apachectl configtest
+
+sudo certbot --apache -d awswithavinashreddy.com -d www.awswithavinashreddy.com
+
+---
+
+Make sure to open https : 443 in your instance security group.
+
+---
+
+Deploying certificate
+Successfully deployed certificate for awswithavinashreddy.com to /etc/httpd/conf.d/awswithavinashreddy-le-ssl.conf
+Successfully deployed certificate for www.awswithavinashreddy.com to /etc/httpd/conf.d/awswithavinashreddy-le-ssl.conf
+
+Congratulations! You have successfully enabled HTTPS on https://awswithavinashreddy.com and https://www.awswithavinashreddy.com
+
+
+
+
+
+===========
+===========
+
+BELOW STEPS WORKS WITH ELB along with ACM SERVICE
+
+============
+
+http to https redirection for Apache
+_____________________________________
+Open Apache configuration file : /etc/httpd/conf/httpd.conf
+
+Add a rewrite rule to the VirtualHost section as below
+
+<VirtualHost *:80>
+RewriteEngine On
+RewriteCond %{HTTP:X-Forwarded-Proto} =http
+RewriteRule .* https://%{HTTP:Host}%{REQUEST_URI} [L,R=permanent]
+</VirtualHost>
+
+
+Save file and restart the service
+
+
+
+
+Http to https redirection for Nginx 
+_____________________________________
+
+
+Open nginx configuration file :  /etc/nginx/nginx.conf
+Add a below entry
+
+server {
+    listen 80;
+    server_name _;
+    if ($http_x_forwarded_proto = 'http'){
+    return 301 https://$host$request_uri;
+    }
+}
+
+
+Save file and restart the service
