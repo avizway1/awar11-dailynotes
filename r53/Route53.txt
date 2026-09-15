@@ -57,6 +57,49 @@ These name server changes will take at least 24 hours whenever you perform this 
 ----
 
 
+ACM : Amazon Certificate manager : 
+
+You are hosting your application in an AWS environment and you want to map an SSL or TLS certificate to that application. Earlier that certificate expired and your team did not notice. You don't want to get into that issue again. How can you auto-renew SSL or TLS certificates for AWS-hosted applications? 
+Ans : we can use ACM with domain validation using Route 53-hosted zone record creation so the SSL certificate will automatically renew. (Validation method: DNS)
+
+
+---
+
+Google DNS Server IP : 
+8.8.8.8
+8.8.4.4
+
+Cloudflare DNS IP : 
+1.1.1.1
+1.0.0.1
+
+Cloudflare DNS that blocks malware automatically: 
+1.1.1.2
+1.0.0.2
+
+Cloudflare DNS that blocks malware and Adult Content automatically: 
+1.1.1.3
+1.0.0.3
+
+---
+
+run --> ncpa.cpl --> Network Interfaces --> propertioes --> ipv4 --> DNS
+
+======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
