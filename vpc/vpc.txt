@@ -1,0 +1,176 @@
+IPv4 : 
+--> 32 bit Address space, split into four 8 bit segments called "Octets" : 2^32
+--> Dotted decimal format (192.168.100.10)
+--> 4.3 billion unique IP Addresses
+32 bit ==> 8 bit.8 bit.8 bit.8 bit 
+
+
+IPv6 : 
+--> 128 bit address space/length (2^128)
+--> hexadecimal format with colons (2001:db6::1)
+--> 340 unidecillion Uniquq IPs
+
+Public IP : 
+Unique across the globe (internet).
+Accessible from anywhere on the internet.
+Will be assigned by ISP (Internet Service Provider), We get charged. by ISP.
+Exposed over internet
+https://checkip.amazonaws.com/
+https://ifconfig.me/
+* In home networks, THis is configured at router. 
+
+Private IP : 
+Unique within the network (intranet)
+Accessible within the local network
+Free to use. No need to pay to anyone.
+
+---
+
+DHCP : Dynamic Host Configuration Protocol : this is a network management protocol that automatically assigns an IP address to the device added to the network. 
+DHCP will have an IP address pool. One of the IPs will be picked and will be allocated to the newly added device. 
+
+
+D-O-R-A : 
+
+Discover : The device or client broadcasts a message to find available DHCP servers on the network. 
+Offer : DHCP server responds with a temporary IP address allocation offer. 
+Request : the client officially requests the offered IP address from the server. 
+Acknowledge : the DHCP server sends the final confirmation. Officially the IP address will be allocated with a lease period. 
+
+----
+
+IPv4 : 
+
+Class A : 0.0.0.0 		- 	126.255.255.255
+Class B : 128.0.0.0		-	191.255.255.255
+Class C : 192.0.0.0		-	223.255.255.255
+ 
+Class D : 224.0.0.0		-	239.255.255.255		: Reserved foe multicast groups
+Class E : 240.0.0.0		-	255.255.255.255		: R&D Experimental purposes
+
+
+127.0.0.0/8 : Loopback : sends: Now it is used by the host machine to send traffic to itself for local software testing or internal testing. The most common loopback IP address is 127.0.0.1. 
+
+
+From every class one particular range is reserved for private IP addresses, which are free and can be used by anyone for any purposes. 
+
+Class A : 10.0.0.0		- 10.255.255.255
+Class B : 172.16.0.0	- 172.31.255.255
+Class C : 192.168.0.0	- 192.168.255.255
+
+---
+
+Host : any individual device that is inside the network with its own IP address (phone, printer, laptop, desktop, smart devices google home, alexa)
+
+Network : Group of interconnected devices that can communicate with each other 
+
+---
+
+Class A : N.H.H.H
+Class B : N.N.H.H
+Class C : N.N.N.H
+
+
+Class A : N.H.H.H : 127 Networks.. 16 million hosts per network.. 
+
+10.0.0.0
+10.0.0.1
+10.0.0.2
+10.0.0.255
+10.0.1.0
+10.0.1.1
+10.0.1.2
+10.0.1.255
+10.0.2.0
+10.0.2.255
+10.255.255.255
+10.(0-255).(0-255).(0-255)
+
+---
+
+Class B : N.N.H.H : 16,384 Networks.. 65k hosts per network.. 
+
+128.0, 128.1, ... 128.255
+129.0, 129.1, ... 129.255
+130.0, 130.1, ... 130.255
+...
+191.0, 191.1, ... 191.255
+
+172.16.0.0
+172.16.0.1 / 0.2 / 0.255 / 1.0 / 1.255 / 2.0 .... 255.255
+
+---
+
+Class C : N.N.N.H : 2 million networks.. and 256 Hots per network..
+
+192.168.0.0			
+192.168.0.1
+192.168.0.2
+192.168.0.3
+..
+192.168.0.255
+
+=============
+
+IPv4 is 32 bit.. 
+
+/32	--> 32 - 32 = 0 = 2^0 = 1
+/31	--> 32 - 31 = 1 = 2^1 = 2
+/30 --> 32 - 30 = 2 = 2^2 = 4
+/29 --> 32 - 29 = 3 = 2^3 = 8
+/28 --> 32 - 28 = 4 = 2^4 = 16			--> Min CIDR Range VPC Supports
+
+/24 --> 32 - 24 = 8 = 2^8 = 256
+
+/20 --> 32 - 20 = 12 = 2^12 = 4096
+
+/16 --> 32 - 16 = 16 = 2^16 = 65536		--> Max CIDR Range VPC Supports
+
+/0 --> 32 - 0 = 32 = 2^32 = 4294967296 IPs
+
+===========
+
+We cannot use all the above IPs.. 
+
+In general networks two IPs will be reserved:
+1. The first IP represents the network ID.
+2. The last IP represents the broadcast ID.
+
+Along with the above two, AWS reserves three more IP addresses so a total of five IP addresses will be reserved if we are creating networks in AWS. 
+3. VPC Router
+4. AWS VPC DNS
+5. For Future usage
+
+============
+
+As AWS reservs 5 IPs.. 
+
+/28 --> 32 - 28 = 4 = 2^4 = 16 - 5 = 11 usable IPs
+
+/24 --> 32 - 24 = 8 = 2^8 = 256 - 5 = 251 usable IPs
+
+/20 --> 32 - 20 = 12 = 2^12 = 4096 - 5 = 4091 usable IPs
+
+/16 --> 32 - 16 = 16 = 2^16 = 65536 - 5 = 65531 usable IPs
+
+============
+
+Default VPC : Default VPCs: all subnets are internet-facing subnets. Technically we call it a public subnet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
