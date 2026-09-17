@@ -158,12 +158,104 @@ As AWS reservs 5 IPs..
 Default VPC : Default VPCs: all subnets are internet-facing subnets. Technically we call it a public subnet.
 
 
+Public SUbnets : Internet phasing subnets 
+Private Subnets : Internal subnets 
+
+============
+
+D: 17/09/2026
+
+1. How big VPC we required for the application we are going to deploy.?
+Ans: Class A / B / C : CIDR Range
+
+2. How many subnets we need in this VPC.?
+
+	2.1 Public SUbnet (Internet facing) 
+		WEB : ap-south-1a & ap-south-1b
+	2.2 Private Subnet 
+		2.2.1 Private Subnet with Internet
+		APP : ap-south-1a & ap-south-1b
+		2.2.2 Private Subnet without internet
+		DB : ap-south-1a & ap-south-1b
+
+3. Do you want to reserve any IPs for future usage.?
+Ans: Yes
+
+===============
 
 
+How many IPs we need for our VPC.? 
+Ans: 10.0.0.0/20 : cvpc-myapp
+
+/20 - 4,096 - 5 = 4091 Usable IPs
+
+Public Subnets: cvpc-web-1a & cvpc-web-1b
+cvpc-web-1a : 10.0.0.0/24
+cvpc-web-1b : 10.0.1.0/24
+
+Private Subnets: cvpc-app-1a & cvpc-app-1b
+cvpc-app-1a : 10.0.2.0/24
+cvpc-app-1b : 10.0.3.0/24
+
+Private Subnets: cvpc-db-1a & cvpc-db-1b
+cvpc-db-1a : 10.0.4.0/25
+cvpc-db-1b : 10.0.4.128/25
+
+Future usage : 10.0.12.0/22
 
 
+Step 1 : create a VPC with Selected CIDR range. 
+cidr: 10.0.0.0/20
+name: myapp-cvpc
+
+Step 2 : Create Subnets within the VPC.
+
+Public Subnets: cvpc-web-1a & cvpc-web-1b
+cvpc-web-1a : 10.0.0.0/24
+cvpc-web-1b : 10.0.1.0/24
+
+Private Subnets: cvpc-app-1a & cvpc-app-1b
+cvpc-app-1a : 10.0.2.0/24
+cvpc-app-1b : 10.0.3.0/24
+
+Private Subnets: cvpc-db-1a & cvpc-db-1b
+cvpc-db-1a : 10.0.4.0/25
+cvpc-db-1b : 10.0.4.128/25
 
 
+Step 3 : Create an Internet Gateway/IGW & And Attach it to CUSTOmVPC.
+* Only one IGW can be attached to one VPC. 
+
+
+Step 4 : Create required route tables within our VPC.
+
+4.1 Public Route : Associate 2 public subnets here.. Add Route via IGW with 0.0.0.0/0
+4.2 Private Route - With internet : Add Application subnets here.. 
+4.3 Private Route - Without internet : Add Database subnets here.. 
+
+Step 5 : Optional but recommended : 
+Enable auto assign public IP address for public subnets
+
+Step 6 : Optional but recommended : 
+Enable DNS hostnames at VPC Level.. 
+
+
+Jump Server / Bastian host : This is a dedicated instance that runs in a custom VPC's public subnet. We use this machine to get connected to private subnet EC2 instances running in a custom VPC. 
+
+===============
+
+Requirement : we need internet for our private application subnets. 
+
+We DON'T use an internet gateway to provide internet to private subnet instances. 
+
+NAT GATEWAY (Network Address Translator) : NAT gateway designed to provide internet to a private-subnet EC2 instance without making the instance public.
+
+** COST US HOURLY BASIS. So, Make sure to delete once you done with the lab.
+
+Regional : Scales automatically across all regional AZs, simplifying management for multi AZ deployments.
+Zonal : NAT Gw creates in specific AZs.
+
+=============
 
 
 
