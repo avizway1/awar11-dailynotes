@@ -230,8 +230,8 @@ Step 3 : Create an Internet Gateway/IGW & And Attach it to CUSTOmVPC.
 Step 4 : Create required route tables within our VPC.
 
 4.1 Public Route : Associate 2 public subnets here.. Add Route via IGW with 0.0.0.0/0
-4.2 Private Route - With internet : Add Application subnets here.. 
-4.3 Private Route - Without internet : Add Database subnets here.. 
+4.2 Private Route - With internet : Add Application subnets here.. Later, add NAT Gateway here..
+4.3 Private Route - Without internet : Add Database subnets here.. No IGW, No NAT GW..
 
 Step 5 : Optional but recommended : 
 Enable auto assign public IP address for public subnets
@@ -255,7 +255,77 @@ NAT GATEWAY (Network Address Translator) : NAT gateway designed to provide inter
 Regional : Scales automatically across all regional AZs, simplifying management for multi AZ deployments.
 Zonal : NAT Gw creates in specific AZs.
 
-=============
+=================================================================
+
+D: 18/09/2026
+
+Requirement : Access other aws services from the private subnet ec2 instances, which dont have internet access. (Even IAM ROle attached, but wont work)
+
+Endpoints : Helps to establish private connectivity across services.
+
+Gateway Endpoint : We can create, but Managed by AWS. We need to pay for data transfer.. We cna use with S3/DynamoDB/S3Express services.
+
+Interface Endpoint :  We can create and we need to manage. We get an Network Interface Card.. We need to pay for NIC and Data transfer.. 
+
+
+Q: Can we connect to private subnet ec2 instances directly, without using Jump Server.
+Ans: We can use "EC2 Instance Connect Endpoint", Create it in public subnet, use it and connect. 
+
+-----
+
+VPC Peering : Helps to establish communication between multiple VPC resources. 
+
+Limitation : 2 VPCs CIDR range should not conflict. 
+VPC peering is non-transitive peering.
+
+					Requester VPC				Accepter VPC
+					
+Acc ID: 			992189742322				982424467695
+VPC ID : 			vpc-00c603ab3da830ea4		vpc-029a6b1a50b52f4ec
+CIDR Range : 		10.0.0.0/20					172.31.0.0/16				
+Region:				ap-south-1					ap-south-1		
+
+Step 1 : Create a peering connection request from requester account. 
+Step 2 : Switch to Accepter account / Inform to accepter account to accept the peering connection. 
+update route tables at both accounts.. 
+Step 3 : At requester VPC, Update the route table with Accepter VPC CIDR range via Peering connection.
+Step 4 : At Accepter VPC, Update the route table with Requester VPC CIDR range via Peering connection.
+
+===========
+
+Network ACLs : NACLs : 
+
+By default, all subnets will be part of default NACLs. All traffic is allowed and no filters applies on defualt NACLs. 
+
+Security groups are stateful, Means... We need to take care about the inbound rules only.. outbound will be allowed automatically as system remembers the traffic flow. 
+--> SGs support only ALLOW operation, We cannot perform explicit DENY with SG.
+--> SGs works at instance level.
+
+NACLs are stateless, Means.. We need to take care about the inbound and outbound rules.. NACLs dont remeber the incoming and outgoing request flow.
+--> NACLs works at subnet level.
+--> NACLs supports ALLOW and DENY options.
+
+
+Inbound : You define exactly what traffic can ENTER the instance/Subnet. 
+Outbound : You define exactly what traffic can LEAVE the instance/Subnet.
+
+Ephemeral Port : When traffic leave the subnet to respons to the request, it does not go out on port 80, it picks a dynamic ephemeral port assigned by Client OS. 
+
+One subnet can be member of only 1 NACL at a time.
+
+===============
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
