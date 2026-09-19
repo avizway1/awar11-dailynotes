@@ -313,16 +313,78 @@ Ephemeral Port : When traffic leave the subnet to respons to the request, it doe
 
 One subnet can be member of only 1 NACL at a time.
 
-===============
+==========================================================================================
+
+D: 19/09/2026
+
+Flow Logs : We can use flow logs to capture the logs at network level.
+
+--> VPC Level
+--> Subnet Level
+--> Instance Level
+
+---------------------
+
+Central NW Account = Its a dedicated account, where we create/run transit gateway and share this tgw with all member accounts. 
+
+Step 1 : Create a TGW in Central Networking Account. 
+
+Step 2 : Using Resource Access manager / RAM Service, Share the TGW with all the member acocunts. 
+
+Step 3 : Switch to member account's RAM Service same region and accept the share.
+
+Step 4 : In Central NW Account, Crreate TGW attachment with local VPC's Subnets.
+
+Step 5 : In Member account, Create a TGW attachment with local VPC Subnets. 
+
+Step 6 : Awitch to Central NW account, Choose the shared TGW attachment and accept it. 
+
+Step 7 : Edit member accounts route tables.. Add a route via Central NW account VPC CIDR.
+
+Step 8 : Edit Central NW accounts route tables.. Add a route via member account VPC CIDR.
+
+=====================
+
+Q: Can we extend existing VPCs CIDR range, if an existing range full.
+Ans: yes, We can add new CIDR range, Make sure it is not conflicting with existig CIDR range. (Irt should not be in same CIDR - as we faced issue in class)
+
+-----
+
+VPN / Virtual private Network : Establish a secured encrypted tunnel between your currently connected network to Organisation/corporate network over the internet.
+
+Firewall Devices : 
+fortinet
+palo alto
+cisco asi
+yamaha
+watchguard
+dell sonicwall
+f5
+barracuda
 
 
+Step 1 : Create a Customer gateway : office firewall device public ip.
+Step 2 : create VPG Virtual private Gateway
+Step 3 : Create Site 2 site von and download the configuration and share with firewall team
+Once configuration completed at firewall level, Tunnels will be up.
 
+=============
 
+NAT Gateway : provides internet to private subnet instances - IPv4
+Egress-only Internet gateways : provides internet to private subnet instances - IPv6
 
+============
 
+AWS Direct Connect : 
+We can establish connectivity between our Corporate network and AWS network using a physical / fiber cable. 
 
+Airtel, jio, Sify Networks
 
+--> Create a Request for Direct connect with AWS partner telecom provider with Required Bandwidth.. 
+--> We get a LoA (Letter of Authorisation).. Submit it to AWS Partner
+--> they fetch cable and perform the configuration, so 
 
+process Time : 3-4 Months
 
 
 
