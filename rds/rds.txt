@@ -1,0 +1,122 @@
+
+
+On-Premise Self Hosted Database : Hardware, OS Seleciton, OS Patching, DB HA, DB Backups.. 
+EC2 Instance Hosted DB : Hardware, OS --> AWS Responsibility.. OS Patching, HA, FT, Backups..
+Amazon RDS Hosted DB : Everything AWS Manages.. Choose DB Engine.. Enable features based on requirement.. 
+
+Relational Database : Structures schema + Relationships.. Data stores in Table format (Rows & Columns).. Banking, ERP, Transactions..  RDS.. 
+Non-Relational Database : JSON Format (Key and Value)..  Flexible schema.. Web apps, user profiles, Catalog, IoT.. DynamoDB
+Graph DB : Neo4j, Amazon Nepture.. Designed for connected data.. Social networking, Fraud Detection.. Recommendations..
+
+RDS : AWS SUpports 7 DB Engines..
+
+1. Amazon Aurora (Mysql Compatbale edition & PostGreSQL Compatable)
+2. MySQL : 3306 							: mysql workbench / dbeaver
+3. PostgreSQl : 5432 						: PGAdmin
+4. Microsoft SSQL : 1433 					: SSMS (SQL Server Management Studio)
+5. MariaDB : 3306 							: Workbecnh
+6. Oracle DB : 1521 						: sql developer / Toad
+7. IBM DB2 : 50000 (Non-ssl), 50001 (SSl)	: IBM Enterprise Tool
+
+----
+
+Pre-Req : Create a DB Subnet group with Custom VPCs DB Subnets. 
+Create a SG. Make sure to follow Pipeline mechanism.
+
+----
+
+EOS : End of Standard SUpport & Extended Support
+EOL : End of Life
+LTS : Long term support
+
+----
+
+Username: dbadmin
+Password : Avinash12345 
+
+----
+
+** We cannot connect to underlying Operating System. We can't manage OS level processes. 
+
+Public Access : NO
+
+You can configure a CNAME in Route53 for RDS Endpoint. later, if we create a new db, we can map new db endpoint to the same name.. without changing anything in the application code.
+
+Endpoint name	: myfirstdb.chggu4icev4n.ap-south-1.rds.amazonaws.com
+R53 CNAME 		: rds.awswithavinashreddy.com
+
+----
+
+sudo dnf install mariadb105 -y					==> Installed mysql client tool
+
+mysql -h <hostname> -u <user-name> -P <port-number> -p
+
+mysql -h rds.awswithavinashreddy.com -u dbadmin -P 3306 -p
+
+SHOW DATABASES;
+
+CREATE DATABASE mystudentsdb;
+
+USE mystudentsdb;
+
+CREATE TABLE users (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(100),
+	age INT
+);
+
+users 
+|
+|-> Id (integrer, Automatically generated, unique)
+|-> name (text, upto 100 charectors)
+|-> age (integer)
+
+
+SHOW TABLES;
+
+DESC users;
+
+SELECT * FROM users;
+
+INSERT INTO users (name, age) VALUES ('Avinash', 36);
+INSERT INTO users (name, age) VALUES ('Anudeep', 34);
+INSERT INTO users (name, age) VALUES ('Aravind', 30);
+
+
+SELECT * FROM users LIMIT 1;
+SELECT * FROM users WHERE age > 32;
+SELECT name FROM users WHERE age > 32;
+
+UPDATE users SET age = 31 WHERE name = 'Aravind';
+
+DELETE FROM users WHERE name = 'Avinash';
+
+TRUNCATE TABLE users;			--> Delete all data from a table
+
+DROP DATABASE mystudentsdb;
+
+---
+
+SELECT user, host FROM mysql.user;
+
+'root'@'localhost'			--> root user can connect from only from loal machine/internal
+'root'@'192.168.100.10'		--> root user can connect from only given IP
+'root'@'%'					--> root user can connect from any IP/host
+
+CREATE USER 'avinash'@'%' IDENTIFIED BY 'Avinash12345';
+
+GRANT SELECT, INSERT, UPDATE ON mystudentsdb.* TO 'avinash'@'%';
+
+FLUSH PRIVILEGES;
+
+EXIT;
+
+---
+
+mysql -h rds.awswithavinashreddy.com -u avinash -P 3306 -p
+
+
+
+
+
+
