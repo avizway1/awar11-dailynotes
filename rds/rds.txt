@@ -14,7 +14,7 @@ RDS : AWS SUpports 7 DB Engines..
 2. MySQL : 3306 							: mysql workbench / dbeaver
 3. PostgreSQl : 5432 						: PGAdmin
 4. Microsoft SSQL : 1433 					: SSMS (SQL Server Management Studio)
-5. MariaDB : 3306 							: Workbecnh
+5. MariaDB : 3306 							: Workbench
 6. Oracle DB : 1521 						: sql developer / Toad
 7. IBM DB2 : 50000 (Non-ssl), 50001 (SSl)	: IBM Enterprise Tool
 
@@ -114,6 +114,71 @@ EXIT;
 ---
 
 mysql -h rds.awswithavinashreddy.com -u avinash -P 3306 -p
+
+
+===================
+
+
+Multi-AZ DB Instance : 
+
+Multi-AZ DB Cluster : 
+
+
+nslookup database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
+
+database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
+admin
+Avinash12345
+
+
+One interview point worth adding: Multi-AZ DB instance uses synchronous replication, while Multi-AZ DB cluster uses semi-synchronous replication. Semi-sync means a write is confirmed once at least one reader acknowledges it, which is why the cluster gets faster commits and faster failover.
+
+
+----
+
+
+Name:   database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
+Address: 10.0.2.102. --> Pv2 - ap-south-1b
+
+Non-authoritative answer:
+Name:    database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
+Address:  10.0.2.34 --> pv1 - ap-south-1a
+
+Reboot With Failover?
+Tickbox Ticked 		--> We are triggering a Manual, forced switchover to another AZ
+Tickbox Not-Ticked 	--> Both the AZ copies restart and wont switchover.
+
+====================
+
+Read Replica : 
+
+We get another copy of our DB, We can choose required configuration for Replica.
+--> Replicas support only read only operations.
+--> If required we can create replica copy in another AZ / Another Region. 
+--> When we perform write operation to WRITER/PRIMARY DB, It replicates to Replica without delays. 
+--> We can promote replica to primary copy. Its irreversable process. 
+
+==> We have an BI Application, that need to scan our entire DB to generate the report. When the scan is happening, your DB is facing perfarmance issues. How you design a solution to fix the DB perm issue..? 
+
+Ans: create a read replica and point the BI application to Read Replica to generate the report. Based on load, we cna adjust the read replicas configuration.
+
+
+===========
+
+https://www.youtube.com/watch?v=OmwutfPSdd4
+
+https://www.youtube.com/watch?v=Mko0C7oQQAw
+
+https://www.youtube.com/watch?v=0pxrVeT9fgg&t=51s
+
+
+
+
+
+
+
+
+
 
 
 
