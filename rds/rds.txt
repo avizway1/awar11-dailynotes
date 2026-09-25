@@ -119,9 +119,16 @@ mysql -h rds.awswithavinashreddy.com -u avinash -P 3306 -p
 ===================
 
 
-Multi-AZ DB Instance : 
+Single-AZ DB instance deployment (1 instance): Creates a single DB instance without standby instances. This setup provides:
+99.5% uptime & No data redundancy
 
-Multi-AZ DB Cluster : 
+Multi-AZ DB instance deployment (2 instances): Creates a primary DB instance with a "non-readable standby instance" in a separate Availability Zone. This setup provides:
+99.95% uptime & Redundancy across Availability Zones.
+
+Multi-AZ DB cluster deployment (3 instances) : Creates a primary DB instance with "two readable standbys" in separate Availability Zones. This setup provides:
+99.95% uptime & Redundancy across Availability Zones
+Increased read capacity & Reduced write latency
+
 
 nslookup database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
 
