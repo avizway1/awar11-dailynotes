@@ -123,7 +123,6 @@ Multi-AZ DB Instance :
 
 Multi-AZ DB Cluster : 
 
-
 nslookup database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
 
 database-1.chc66g4wq10o.ap-south-1.rds.amazonaws.com
@@ -163,7 +162,71 @@ We get another copy of our DB, We can choose required configuration for Replica.
 Ans: create a read replica and point the BI application to Read Replica to generate the report. Based on load, we cna adjust the read replicas configuration.
 
 
-===========
+=============================================================================
+
+Amazon Aurora : Its AWS Own Database Engine..
+It has two compatible editions:
+1. MySQL compatible
+2. PostgreSQL compatible
+
+Aurora also has a serverless option. We can configure minimum and maximum ACUs based on the load. We measure the configuration by using ACU (Aurora Capacity Unit). 
+--> 1 ACU provides 2 GB of memory. 
+
+--> Most of the other databases support a maximum storage of 64 TB only but Amazon Aurora supports up to 128 TB. 
+
+--> Aurora gives 5x better performance at lower cost than other enterprise databases. 
+
+--> Six-way replication across three Availability Zones
+--> Up to 15 read replicas with replica lag under 10-ms
+--> Automatic monitoring with failover
+
+
+We dont have option to disable the backup on Aurora
+Min : 1 Day for Aurora (other DB: We can turn off this feature)
+Max : 35 Days (For all DBs)
+
+
+
+-----
+
+
+Question : for a regular on-premises or self-managed MySQL database we have a configuration file, my.cfg, where we can adjust all the MySQL settings.How can we manage/adjust the settings for AWS-hosted databases? 
+
+Ans : we can adjust the "parameter group" associated with the RDS instance to adjust any of the MySQL configuration settings. 
+--> Some of the settings may require us to restart the DB instance to take effect. 
+
+
+binlog
+cache
+connection
+timeout
+
+----
+
+Question : you are preparing an application for one of the corporate school/college lab environments. Students have to explore the RDS, Once their lab is completed, we dont want the data students created. 
+You need to provide a fresh database to another set of students. You don't want to create multiple databases for every batch. You decided to use the same databases for different batches. How can you achieve this? 
+
+Ans: use Amazon Aurora with the backtracking option. It supports 72 hours of backtracking. 
+
+---
+
+Snapshot : a snapshot is nothing but a backup copy of our database. A snapshot happens based on two things:
+1. the backup window we configured on our DB cluster
+2. whenever we are performing any major modifications on our database, Atlas automatically takes a snapshot.
+
+3. We always have option to create a snapshot manually.
+
+
+---
+
+We have 2 options to restore our Database.
+
+1. Snapshot (Use latest snapshot and restore the DB) 
+2. PITR : Point In Time Recovery : AWS automatically backups data, we can choose the time frame to get a new copy of our DB.
+
+
+
+=============================================================================
 
 https://www.youtube.com/watch?v=OmwutfPSdd4
 
