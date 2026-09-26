@@ -1,0 +1,60 @@
+
+
+---
+
+sudo yum install -y python3-pip mariadb105 redis6
+pip3 install flask pymysql redis
+
+
+=======
+
+export DB_HOST="myfirstdb.chggu4icev4n.ap-south-1.rds.amazonaws.com"
+export DB_PORT="3306"
+export DB_USER="dbadmin"
+export DB_PASSWORD="Avinash12345"
+export DB_NAME="productdb"
+export REDIS_HOST="myappdata-idzwzl.serverless.aps1.cache.amazonaws.com"
+export REDIS_PORT="6379"
+export CACHE_TTL="60"
+
+
+====
+
+create schema.sql
+
+mysql -h $DB_HOST -u $DB_USER -p"$DB_PASSWORD" < schema.sql
+
+====
+
+
+python3 app.py
+
+
+pkill -f app.py
+
+
+========
+
+python3 -c "
+import redis
+r = redis.Redis(
+    host='$REDIS_HOST',
+    port=6379,
+    ssl=True,
+    ssl_cert_reqs=None,
+    decode_responses=True
+)
+print(r.ping())
+"
+
+
+
+
+
+
+
+
+
+
+
+

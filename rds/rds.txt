@@ -232,8 +232,9 @@ We have 2 options to restore our Database.
 2. PITR : Point In Time Recovery : AWS automatically backups data, we can choose the time frame to get a new copy of our DB.
 
 
-
 =============================================================================
+
+Blue & green deployment, Backtracking & RDS Proxy
 
 https://www.youtube.com/watch?v=OmwutfPSdd4
 
@@ -241,6 +242,125 @@ https://www.youtube.com/watch?v=Mko0C7oQQAw
 
 https://www.youtube.com/watch?v=0pxrVeT9fgg&t=51s
 
+
+=============================================================================
+
+D: 26/09/2026
+
+
+A cache is a high-speed temporary data storage layer that holds frequently accessed data in memory. 
+--> The primary goal of a cache is to serve future data requests faster. 
+--> The cache will significantly reduce the workload on the primary database. 
+--> very less latency
+--> primary database load will decrease.
+
+How cache works: 
+1. Cache hit : the application checks the cache first. If the requested data is found it is returned instantly. 
+2. Cache Miss : if data is not in the cache, the application is forced to query the primary database. Once it retrieves the requested information, data is sent back to the user and written or stored into the cache. The next time someone asks for the exact data, it results from cache. 
+
+Common caching strategies: 
+Cache-Aside : Cache-Aside is the most common approach. The application explicitly talks to both the cache and the database. The application checks the cache first. If it misses, it queries the database and manually updates the cache. 
+
+Write-Through : the application writes data directly to the cache, which synchronously updates the backend database before completing the operation. 
+
+write-behind (write-back): the application writes data straight to the cache, which immediately acknowledges the write. The cache then updates the primary database synchronously later. 
+
+---
+
+
+Elasticache : it's a caching service designed for RDS. It can cache RDS database information and we can integrate our application with this cache before directly hitting our database to get the information. 
+
+--> Redis OSS
+--> valkey Cache (*Recommended)
+--> memcacheD
+
+---
+
+DynamoDB : dynamoDB has a caching service. The service name is DAX (DynamoDB Accelerator). 
+
+---
+
+DynamoDB is a serverless, non-relational database, commonly called a NoSQL database. Data strores in JSON format, simple key and values pairs. 
+
+--> Single-digit millisecond latency at any scale of data.
+
+{
+"name": "Avinash"
+"age": "36"
+},
+{
+"name": "Anudeep"
+"age": "35"
+}
+
+
+Primary key : it's a unique column in a database table that guarantees every single row can be identified. 
+
+Rules of Priamry key:
+1. Uniqueness : No two rows in table can share same primary key
+2. Non-null values : can never be empty
+3. Single constraint : table can have only one primary key
+4. Immutability : the value of primary key should never changed once created.
+
+
+---
+
+OLTP : Online Transaction Processing : RDS
+--> Banking transactions
+--> Online / e-commerce
+--> ATM Withdrawals
+
+--> CRUD : Create / Read / Update / Delete
+--> Mainly focused on Operational Data
+
+
+OLAP : Online Analytical Processing : Redshift, Snowflake, Databricks
+Used for analytics and reporting on large datasets, originated from multiple sources.
+
+--> Sales report
+--> Trend analysis
+--> Business Intelligence Dashboards
+
+--> Can read a huge amount of historical data 
+--> Can perform complex queries 
+--> Can perform analytics and help us in decision making 
+
+---
+
+Redshift : redshift offers OLAP on AWS. It can integrate with other AWS services. It's called an AWS data warehousing solution. 
+
+Leader Node : the leader node plans the query execution and it is responsible for executing the query and providing the result. 
+Compute Node : a compute node is a machine that actually stores all the huge data. 
+
+WLM : workload management : WLM helps us to control how queries can use cluster resources so one heavy query doesn't choke everything else. 
+
+How WLM works: WLM lets you create queues. Each queue gets a dedicated slice of memory and concurrency slots. 
+
+Queue : a lane of data flow
+Each queue has a memory limit and max concurrency slots.
+Queries routes to Queue based on rules.
+
+Auto WLM : redshift automatically manages the memory and concurrency. 
+Manual WLM : we can define the queue's memory percentage and slots ourselves. 
+
+-----
+
+DMS : Database Migration Service. We can use this DMS service to perform homogeneous migrations and heterogeneous migrations. 
+
+homogeneous migrations : Same class of DB source and target data migration. (mysql --> mysql)
+heterogeneous migrations : Diff class cource and target migration (Mongodb --> postgre)
+
+Full Load : Replicate all existing data once.
+
+CDC - Change Data Capture : Ongoing changes will replicate
+
+Full Load + CDC : Once full load and then ongoing changes will replicate.
+
+----
+
+
+How to connect to private subnet DB via Public Subnet Hosted Jump server.? 
+Ans :  Use mysql TCP/IP over SSH option.. Via Jump server (with pwd / keypair)..
 
 
 
