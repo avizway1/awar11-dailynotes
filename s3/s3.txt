@@ -1,0 +1,151 @@
+
+D: 28/09/2026
+
+
+Storage Types : 
+Block Based Storage : We can attach to instance, we can run OS.. Install programs.. : EBS 
+Storage over network / Shared Storage : EFS
+Object Based Storage : S3
+
+
+
+S3 : simple storage service. 
+
+--> We can store all flat files. 
+--> We have to create a bucket to store the object. The object can be anything. 
+
+Bucket = folder / Directory with unique namespace.
+Object = Whatever we store inside a bucket, we call it as a object.
+
+General purpose Bucket : it's a traditional S3 bucket for storing objects like files, images, backups, videos, and audios. Data spans across Multi AZs.
+
+Directory Bucket : a special bucket designed for S3 Express One Zone, providing low latency for single-availability-zone applications. Data stores only in 1 AZ.
+
+Table Bucket : table buckets designed for storing Apache Iceberg tables. We can use this table for analytical purposes. 
+
+vector Bucket : the purpose of a vector bucket is for storing and querying vector embeddings with vector indexes and similarity search APIs. AI/ML - RAG, semantic Search.. 
+
+Similar meaning --> Nearby Vectors
+Different Meaning --> Distant vector
+
+---
+
+Global Namespace : Bucket name should be unique across the globe. 
+
+Account Regional namespace : General purpose buckets created in your account Regional namespace are unique to your account. These buckets can never be created by another AWS account.
+
+
+Bucket Naming standards: 
+- Minimum 3 characters
+- Maximum 63 characters
+- No Capital letters
+- Should not start with a dot
+- Should not end with a dot
+- No adjacent dots
+- Should not resemble an IP address format
+
+--> We have unlimited storage in the S3 platform. 
+
+--> Min Obj Size : 0 bytes
+--> Max Obj Size : 50 TB (Earlier its 5 TB only)
+
+aws s3 mb s3://bucketname --region ap-south-2
+
+
+
+Standard path : https://s3.<region-code>.amazonaws.com/<bucket-name>/<object-name>
+
+Virtual path: this works when we don't have a "dot" in the bucket name. 
+https://<bucket-name>.s3.<region-name>.amazonaws.com/<object-name>
+https://<bucket-name>.s3.amazonaws.com/<object-name>
+
+---
+
+By default, all our buckets are private and whatever data you upload to that bucket is also private. 
+
+Account-level block public access : OFF By default..
+Bucket-level block public access 
+Object-level public access
+
+---
+
+Step 1 : Turn off public access at the bucket level. 
+step 2 : We have 2 options to make objects public
+	--> Bucket Policy (later and widely used)
+	--> ACLs : Disabled by default. Enable it.. (Object Ownership --> ACLs enabled)
+Step 3 : Choose the object and make it public using ACL.
+
+---
+
+S3 Storage Classes : 
+
+S3 Standard : designed for frequently accessed data with millisecond access.
+- We can access data without any delays.
+- Data spans across multiple availability zones (>= 3 AZs)
+- 99.99% Availability.. 99.999999999% Durability..
+
+Standard-IA (Infrequently Accessed) : designed to store less frequently accessed data. 
+- We can access data  without any delays.
+- Data spans across multiple availability zones (>= 3 AZs)
+- 99.99% Availability.. 99.999999999% Durability..
+
+OneZone-IA (Infrequently Accessed) : designed to store less frequently accessed data. 
+- We can access data without any delays.
+- Data store only in 1 availability zones (1 AZs)
+- 99.95% Availability.. 99.999999999% Durability..
+
+Glacier Instant Archieve :
+--> Long-lived archive data access once a quarter with instant retrieval in milliseconds. 
+
+Glacier Flexible Retrieval : 
+- Long-lived archive data accessed once a year with Retrieval time 2 to 5 hours. 
+- We cannot access data immediately. 
+- We need to initialise the data restoration to view the object. 
+
+Glacier Deep Archieve : 
+- Long-lived archive data accessed once a year with Retrieval time 12 to 24 hours. 
+- We cannot access data immediately.
+- We need to initialise the data restoration to view the object. 
+
+Data Retrival Options:
+Bulk Retrival : data retried typically within 5 to 12 hours. 
+Standard Retrival : data retried typically within 3 to 5 hours. 
+Expedited Retrival : data retried typically within 1 to 5 minutes, Max obj size is 250 MB. 
+
+
+RRS : reduced redundant storage : "not recommended" as durability is just 99.99% and cost is more than standard. 
+
+Intelligent tiering : we can store data with changing or unknown access patterns. 
+
+
+========================
+
+S3 Pricing : 
+
+- How many API calls are happening on our data? (GET / PUT / DELETE / UPDATE)
+- How much data is being transferred?
+- How much data are you storing S3 in GB or TB per day?
+- What storage class are you using: Standard, IA, Standard, Glacier, or Infrequently Accessed?
+- Are you performing any data retrievals from storage classes?
+
+========================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
