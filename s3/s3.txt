@@ -5,7 +5,7 @@ D: 28/09/2026
 Storage Types : 
 Block Based Storage : We can attach to instance, we can run OS.. Install programs.. : EBS 
 Storage over network / Shared Storage : EFS
-Object Based Storage : S3
+Object Based Storage : Everything stores as a object / flat file. We cannot install any OS, run any application : S3
 
 
 
@@ -76,6 +76,10 @@ step 2 : We have 2 options to make objects public
 Step 3 : Choose the object and make it public using ACL.
 
 ---
+Access Pattern : 
+How frequestnly we are accessing our data, 
+WHen we need, how quickly we need the data..
+---
 
 S3 Storage Classes : 
 
@@ -130,17 +134,62 @@ S3 Pricing :
 
 ========================
 
+D: 29/09/2026
+
+Versioning : versioning helps to maintain multiple copies of our object within the same bucket. 
+- By default versioning will be in a suspended state. 
+- Existing objects won't have any version ID. After enabling versioning all uploads will get a version ID. We cannot manage or edit this ID. 
+
+- If any override happens we can delete one particular version to get our object to a proper state. 
+- If any object is deleted accidentally (Versioning = hide state), we will get a delete marker. Delete the delete marker to get the object back. 
 
 
+Permanently delete : Object is Gone, No way to get the object back.
+Delete : We will get a delete marker, Delete the delete marker to get the object back.
+
+----
+
+Problem 1 : when we enable versioning and start using versioning, for every edit we will get a version and obviously this will incur more cost. 
+
+Problem 2 : we have some data. We are going to access the data 
+- frequently for the first 30 days, 
+- less frequently for 30 to 90 days.
+- As a compliance requirement, we need to store the data for at least 3 years and 
+- after 3 years it needs to be deleted automatically. 
+
+Solution : 
+life cycle management role / LCR : LCR helps to transition an object from one storage class to another storage class based on the defined days. Also we can configure to Delete an object at a particular time. 
+
+- We can apply a particular transition configuration for current versioned objects and 
+- another set of configuration for non-current versioned objects. 
+- We do have an option to apply retention for the most recent copies. 
+
+=============
+
+Replication : 
+
+SRR : Same Region Replication : Source bucket and target backets are in same region.
+CRR : Cross Region Replication : Source bucket and target backets are in diff region.
+
+--> Versioning must be enabled on the source and target buckets to use this replication option. 
+
+RTC : replication time control. This feature helps us to replicate any data to a target bucket within 15 minutes (99.99%). 
 
 
+** EXAM : The source bucket already has some data. You decided to enable replication to another bucket. How can you replicate existing data? 
+Ans : we can configure or create a one-time batch job and replicate the data. 
 
+--- 
+--> We can use sync command to replicate all existing data to target bucket, then we cna configure replication.
+aws s3 sync s3://source-bucket-name s3://target-bucket-name
 
+--- 
 
+Event Notifications: 
 
-
-
-
+Lambda function : Run a Lambda function script based on S3 events.
+SNS topic : Fanout messages to systems for parallel processing or directly to people.
+SQS queue : Send notifications to an SQS queue to be read by a server.
 
 
 
