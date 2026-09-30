@@ -191,6 +191,117 @@ Lambda function : Run a Lambda function script based on S3 events.
 SNS topic : Fanout messages to systems for parallel processing or directly to people.
 SQS queue : Send notifications to an SQS queue to be read by a server.
 
+============================================================
+
+D: 30/09/2026
+
+
+Encryption is the process of converting human-readable data into unreadable or cypher/scrambled text to protect its privacy and security. 
+
+Plaintext: The original readable information
+Ciphertext: the scrambled, unreadable data
+Cryptographic Keys : a special digital code or mathematical value used to lock (encrypt) and unlock (decrypt) the information back into readable form 
+
+Symmetric encryption : use the exact same key for encryption and decrypting the data. 
+Asymmetric encryption : uses a pair of keys: a public key to lock/encryption the message and a private key to unlock/decryption it. 
+
+
+encode : scrambled text is fixed.
+encrypt : scrambled text will/can be change.
+
+
+--
+
+In-Transit Encryption / At-Flight Encryption : when the data is in the travel state to the S3 platform, data will be encrypted, similar to websites with the HTTPS protocol (SSL or TLS certificate).  
+
+Client Side Encryption / CSE : before uploading data to the S3 platform, we can use our own encryption method and we can encrypt the data. This is purely the customer's responsibility. 
+
+Server Side Encryption / SSE : when data is in the S3 platform, we can apply our required encryption method. We have multiple options here. 
+
+
+Server Side Encryption with S3 managed keys (SSE-S3) : default encryption method..
+- S3 Generates and Manages the key material.
+- Whoever has access to the S3 platform can decrypt the data. No additional permissions required. 
+- We "can make data public" using only this particular key type. 
+- No direct access to key material. We cannot view/alter/delete/rotate the keys. 
+
+---
+
+SSE - KMS (Key Management Service) - DMK (Default Master Key)
+- KMS Service Generates and Manages the key material.
+- Whoever has access to the S3 platform can decrypt the data. No additional permissions required. 
+- No direct access to key material. We cannot view/alter/delete/rotate the keys. 
+- This key is created automatically whenever we start using any of the services. 
+- We cannot make objects public. 
+
+---
+
+SSE - KMS (Key Management Service) - CMK (Customer Master Key)
+- Customer has to Create the KMS Key... KMS Service Manages the key material.. 
+- User should have S3 Access first.. User/role should have permissions on KMS Key as well (usage permissions).
+- No direct access to key material. We can rotate the key material.  
+- We cannot make objects public. 
+
+---
+
+SSE - KMS (Key Management Service) - C (Customer provided Key)
+- Customer has to Create and Manages his own key and ...  We need to upload the Key to KMS Service.. 
+- User should have S3 Access first.. User/role should have permissions on KMS Key as well (usage permissions).
+- Customer is responsible for key material and he can rotate the key material based his requirement.  
+- We cannot make objects public. 
+- https://youtu.be/r17Z75TqjU0?si=D2dfZQViUuVnY6Bw
+
+---
+
+Key creation steps:
+
+1. Configure key : choose "symmetric" and "encryption and decryption".
+2. Add labels i.e; alias, description, tags..
+3. Define key administrative permissions (Avinash_T)
+4. Define key usage permissions (Avinash_T)
+5. Review and create
+
+---
+
+signature version 4 : outdated signature protocol, missing credentials, or mismatched cryptographic key. 
+
+---
+
+Interview : you have an EC2 instance. You are trying to access an S3 bucket from the EC2 instance but you are not able to access the data. 
+- You are able to list the buckets but you are not able to access data from one particular bucket. 
+- What might be the reason? How you troubleshoot? 
+
+Answer : (User / Role)
+- I will verify the IAM user's permission on that particular bucket. 
+- I will verify whether the S3 bucket has any particular encryption key. 
+- Will also verify that particular IAM user's permissions on KMS key usage permissions. 
+
+---
+
+Interview : a user has S3 full access but still he is not able to access some of the data. What might be the reason? How you troubleshooted? 
+
+---
+
+OBJECT LOCK : we can store objects using the WORM (Write-Once-Read-Many Model ) model to help prevent objects from being deleted or overridden for a fixed amount of time. Object lock works only in versioned buckets. We have two types of modes:
+
+1. Governance : users with specific IM permissions can override or delete protected object versions during the retention period. (PERMISSIVE)
+
+2. Compliance : no user can override or delete protected object versions during the retention period, "including the root user". 
+
+----
+
+Transfer Acceleration : we can upload data to an S3 bucket via edge locations or a CloudFront distribution. 
+
+https://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html?region=ap-south-1&origBucketName=avinash
+
+----
+
+
+
+
+
+
+
 
 
 
