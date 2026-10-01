@@ -294,7 +294,165 @@ Transfer Acceleration : we can upload data to an S3 bucket via edge locations or
 
 https://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html?region=ap-south-1&origBucketName=avinash
 
+====================================================================
+
+D: 01/10/2026
+
+
+We have an IAM user. The user has S3 full access but one bucket is hosting some confidential information. I don't want to allow this user to perform delete, upload, view, or open objects in that particular bucket. 
+
+ARN : Amazon Resource Name
+
+Bucket ARN : arn:aws:s3:::avinash28092026
+Prinicipal : user arn
+Effect : Allow / Deny
+Actions to take effect : PutObject, GetObject, DeleteObject, *
+
+
+Bucket Level Operations : arn:aws:s3:::avinash28092026
+Object Level Operations : arn:aws:s3:::avinash28092026/folder/* , arn:aws:s3:::avinash28092026/*
+
+** If you're not sure about bucket-level or object-level operation, add both. 
+
+
+Bucket ARN : arn:aws:s3:::avinash28092026, arn:aws:s3:::avinash28092026/*
+Prinicipal : arn:aws:iam::992189742322:user/encry-test
+Effect : Deny
+Actions to take effect : PutObject, GetObject, DeleteObject
+
+https://awspolicygen.s3.amazonaws.com/policygen.html
+
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Statement1",
+      "Effect": "Deny",
+      "Principal": {
+        "AWS": "arn:aws:iam::992189742322:user/encry-test"
+      },
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
+        "s3:GetBucketPolicy",
+        "s3:GetBucketPolicyStatus",
+        "s3:DeleteBucketPolicy"
+      ],
+      "Resource": [
+        "arn:aws:s3:::avinash28092026",
+        "arn:aws:s3:::avinash28092026/*"
+      ]
+    }
+}
+
 ----
+
+I want to make an entire bucket public.. 
+
+Effect : Allow
+Actions : GetObject
+Resource : arn:aws:s3:::avinash28092026/*
+Principal : *
+
+----
+
+Scenario: one bucket should be accessible for only one particular user. If other users have S3 full access or administrator access, they should not be able to work on this particular bucket. 
+
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyAllExceptEncryTest",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::avinash28092026",
+        "arn:aws:s3:::avinash28092026/*"
+      ],
+      "Condition": {
+        "ArnNotEquals": {
+          "aws:PrincipalArn": "arn:aws:iam::992189742322:user/encry-test"
+        }
+      }
+    }
+  ]
+}
+
+================
+
+CORS : cross-Origin-Resource-Sharing : . It is a browser security mechanism that allows or restricts a web page from requesting resources (like APIs, fonts, or images) from a different domain than the one it was loaded from.
+
+https://www.youtube.com/watch?v=YrfDLrSVxQ8&t=239s
+
+[
+  {
+    "AllowedOrigins": [
+      "https://yourdomain.com",
+      "https://yourdomain.com"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "HEAD"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": [
+      "ETag",
+      "x-amz-meta-custom-header"
+    ],
+    "MaxAgeSeconds": 3000
+  }
+]
+
+
+==============================
+
+Presigned URL : Temporary URL that gives someone access to a private S3 object without giving them AWS credentials , The URL should expire after particular period of time.
+
+aws s3 presign s3://avinash28092026/s3.txt --expires-in 60
+
+--> Without making a bucket public, without making an object public, we do have an option to share an object with everyone using a presigned URL. That URL expires after the given time. 
+
+==============================
+
+S3 MultiPart Upload : 
+
+We can upload a large object to S3 in smaller chunks/parts. 
+
+- Has feature to resume if object failed to upload. 
+- Faster uploads using parallelism. 
+- We can choose for larger or huge files. 
+
+aws s3api create-multipart-upload --bucket avinash --key largefile.zip
+
+aws configure set default.multipart_chunksize 128MB
+
+---
+
+We can use third-party tools to access S3 data. 
+
+https://s3browser.com/
+https://www.msp360.com/explorer/windows/
+
+==============================
+
+S3 default performance:
+
+3500 PUT operations per second per prefix 
+5500 GET operations per second per prefix. 
+
+--> Use more prefixes (Folder). 
+--> Every prefix supports 3500 PUT & 5500 GET.
+
+--> Add randomness to the object names so that the search mechanism works better. 
+(year/month/date/hr/sdr-name-timestamp)
 
 
 
