@@ -455,6 +455,72 @@ S3 default performance:
 (year/month/date/hr/sdr-name-timestamp)
 
 
+===========================================================================
+
+D: 05/10/2026
+
+
+Static Website : 
+--> Fixed Content for everyone
+--> HTML, CSS, JS
+--> No Database / Backend.
+--> landing page, documentation, portfolio
+--> amplify, S3 Static website
+
+Dynamic Website : 
+--> Content can be chnage based on users/data.
+--> HTML, CSS, JS + backend/server/database.
+--> Usually DB required
+--> e-commerce, banking, social media, lms
+--> ec2, lambda, rds, dynamodb, ecs, eks, route53
+
+
+S3 Static website hosting: 
+--> We can host static webiste using S3 service.
+--> By default, we get S3 performance for our website as well. (5500 GET, 3500 PUT / Seconds).
+--> We have limitations.
+	--> your bucket name should be same as domain name.
+	--> We cannot integrate with AWS ACM for SSL/TLS Cert.
+
+---
+
+Cloudfront : Its a CDN service (Content Delivery Network).. 
+It also called as PoP Location (Point of Presence).. 700+ edge locations
+
+
+TTL : Time to Live 
+RTT : Round Trip Time
+
+Min TTL : 0 seconds
+Default TTL : 86400 Seconds / 24 hrs / 1 day
+Max : 365 Days
+
+
+--> Cloudfront is a Global service, Doesnt required region selection. So, Certificate must be present in N.Virginia region only.
+
+Invalidation : We can clear cache from all the edge locations, All new requests will fetch data from origin.
+
+Origin: where data is hosted.
+
+CloudFront geographic restrictions : Based on end user geo location, we can allow / deny. 
+
+
+=====================
+
+API Gateway : frontdoor of our application.
+
+We dont expose our application directly to users. Instead, we put API GW in front - It receives requests, route them and return response. 
+
+REST API 
+HTTP API
+WebSocket API
+REST API Private
+
+
+
+
+
+
 
 
 
