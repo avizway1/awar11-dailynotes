@@ -1,0 +1,93 @@
+
+
+Cloudtrail : THis service contineously logs AWS account activities. 
+--> Its enabled by default. it can store all logs for 90 days without any addl configuration.
+--> We can send logs to s3 bucket, we do have option to send logs to cloudwatch and configure rentewntion perios using Life cycle rule. 
+--> We can filter logs using multiple options i.e; username, accesskey, eventname, event source.. 
+
+With CLoudtrail, We can only log AWS activities, We cannot track / log events occuring inside EC2 instances / S3 Object.. 
+
+We have 4 types of trails:
+
+1. Management Trail : Captures aws operations performed on AWS console 9Instance launch / s3 bucket create / iam user create / Delete)
+2. Data Trail : S3, lambda, dynamodb : We can enable data trail for current and future s3 buckets also.. 
+3. Insight Events : Helps to identify abnormal traffic, errors or user behaviour..
+4. Network Trail : Network flow events.. 
+
+AWS Organisations : We can bring multiple aws accounts under one roof.
+We can enable logs at organisatins level. All account logs store in single s3 bucket.
+When external auditor visits our org, Create an IAM user with s3 read and provide access on central logging bucket. 
+
+---
+
+AM IAM users credentials got compromosed. How you troubleshoot.?
+
+--> Disable the user, Reset the password, Enable MFA.
+--> What are the activities the user performed using compromised cred. 
+--> Did that user created any other users / changed any existing users password.
+--> Inspect VPC flow logs, NACLs to Block traffic, Allow login only from trusted networks.
+--> Incident Investigation / Remediation / RCA - Root Cause Analysis.
+
+---
+
+Amazon Config : Tracks all the resources and flag resources as non-compliant, if its not following the rules we configure in config service.
+
+Compliant : 
+Non-Compliant : 
+
+PCI-DSS : Oayment card industry, Data Security Standards
+HIPAA : Health Insurance probability and accountability act
+SOC2 : Service Organisation Control 2
+CIS : Center for internet Security
+GDPR : General Data protection Regulations
+ISO 27001 : 
+fedRAMP : Federal Risk and Authorization Management Program 
+
+Configuration History
+Compliance rules
+Compliance dshboard
+
+
+Task : Configure S3 bucket public access detection and automatic remediation, and test it.
+
+-----
+
+Trusted Advisor : Provide suggestions on best practices we have to follow on some of the core areas.
+
+Cost Optimisation : Over provisioned resources
+Performance : bottlenecks .. Under provisioned resources
+Security : SG open for everyone, Snapshots public
+Fault Tolarance : Application span across multiple AZs
+Service limits : hitting aws soft limits
+Operational excellence : logs
+
+** It wont fix the findings automatically. We need to take actions. 
+
+---
+
+AWS Shield & AWS Shield Advanced : Helps to protect resources from DDoS attacks. 
+
+Distributed Deniel of service
+
+AWS Shield : Enabled by default in all aws accounts.. Provides basic support on DDoS Attacks.. 
+
+AWS Shiled Advanced : $3000/Month.. With 1 yr commitment.. 
+--> AWS Shield Response Team (SRT) support
+
+--> ASG - Auto Scaling Group
+--> Cloudfront - Has buildin capabilities to protect DDoS attacks
+--> Shield Advanced
+
+----
+
+AWS WAF : Web Application Firewall : Protect our web application from common web exploits.
+
+WAF is a firewall serevice that let us to monitor web requests forwarded to our aws resources i.e; Cloudfront, LoadBalancer, API Gateway, Cognito uSerpool, amplify.. 
+
+
+
+
+
+
+
+
