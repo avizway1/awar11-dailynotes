@@ -1,0 +1,353 @@
+
+Checks all volumes are encrypted or not..??
+__________________________
+import json
+import sys
+import boto3
+client = boto3.client('ec2')
+sns = boto3.client('sns')
+sns_topic = "arn:aws:sns:ap-south-1:5011764283:lambdan"
+sns_subject = "Non Encrypted EBS Volumes"
+Non_Compliant = []
+def lambda_handler(event, context):
+    result = client.describe_volumes(Filters=[
+        {'Name': 'encrypted', 'Values': ['false']},
+        {'Name': 'attachment.device', 'Values': ['/dev/sdf', '/dev/sdg', '/dev/x*']}
+    ])
+    msg = "Hi Team," + "\n" + "Below is the list of Non-Encrypted Volumes details" + "\n" + "Please take actions on these volumes" + "\n"
+    for volume in result['Volumes']:
+        tags = {}
+        for tag in volume.get('Tags', []):
+            tags[tag['Key']] = tag['Value']
+        if 'exception' in tags:
+            print(volume['VolumeId'])
+        else:
+            print("---" + volume['VolumeId'])
+            noncompliant = 'Non Compliant Volume ID: %s.' % volume['VolumeId']
+            Non_Compliant.append(noncompliant)
+            msg = msg + "\n" + noncompliant
+    sns.publish(TopicArn=sns_topic, Message="\n" + msg, Subject=sns_subject)
+    # return Non_Compliant
+_____________________________________
+
+EBS Volumes status :
+_____________________________________
+import boto3
+import json
+client=boto3.client('ec2')
+sns = boto3.client('sns')
+sns_topic = "arn:aws:sns:ap-south-1:518082393:S3Notifications"
+sns_subject =  "Un-attached/not in use EBS Volumes"
+Non_Compliant=[]
+tags = {}
+def lambda_handler(event, context):
+    result = client.describe_volumes( Filters=[{'Name': 'status', 'Values': ['available']}])
+    msg = "Hi Team," + "\n" + "Below is the list of available status Volumes details" + "\n"
+    for volume in result['Volumes']:
+        for tag in volume['Tags']:
+            tags[tag['Key']] = tag['Value']
+            #print(tags)
+        if 'avlexception' in tags:
+            print('Compliant volume',volume['VolumeId'])
+        else:
+            print('Non Compliant Volume/Not attached'+ volume['VolumeId'])
+            noncompliant='Non Compliant Volume id %s' %volume['VolumeId']
+            Non_Compliant.append(noncompliant)
+            msg = msg + "\n" + noncompliant
+            sns.publish(TopicArn='arn:aws:sns:ap-south-1:518084852393:S3Notifications', Message = "\n" + msg, Subject='EBS Volume in available status')
+    # return Non_Compliant
+	
+===================================================================
+
+Stop and start instances using lambda **
+__________________________________________________________
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Start*",
+        "ec2:Stop*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+_________________
+Stops the EC2 instances
+_________________________
+
+import boto3
+region = 'ap-south-1'
+instances = ['i-12345', 'i-2345']
+ec2 = boto3.client('ec2', region_name=region)
+def lambda_handler(event, context):
+    ec2.stop_instances(InstanceIds=instances)
+    print('stopped your instances: ' + str(instances))
+
+_________________________________
+Starts the EC2 instances
+_________________________________
+import boto3
+region = 'ap-south-1'
+instances = ['i-12345', 'i-2345']
+ec2 = boto3.client('ec2', region_name=region)
+def lambda_handler(event, context):
+    ec2.start_instances(InstanceIds=instances)
+    print('started your instances: ' + str(instances))
+___________________________________________________
+
+https://www.youtube.com/watch?v=8gfSS-ZIulQ
+
+
+___________________________________________________
+
+Stop ec2 instance when file uploaded into s3 bucket 
+___________________________________________________
+
+import boto3
+def lambda_handler(event, context):
+    instance_id = "i-04379f102b8abd831"  # Replace with the actual instance ID
+    ec2 = boto3.client('ec2')
+    ec2.stop_instances(InstanceIds=[instance_id])
+    return {
+        'statusCode': 200,
+        'body': 'Instance stopped successfully.'
+    }
+	
+___________________________________________________
+
+What ever the file names starting with "A/a" should move to another s3 bucket
+___________________________________________________
+
+import boto3
+def lambda_handler(event, context):
+    source_bucket = 'lambda-try'		# Replace with the actual S3 Bucket
+    target_bucket = 'a-copy'			# Replace with the actual S3 bucket
+    s3 = boto3.client('s3')
+    # List all objects in the source bucket
+    response = s3.list_objects_v2(Bucket=source_bucket)
+    # Iterate through the objects and copy those starting with "s" to the target bucket
+    for obj in response['Contents']:
+        if obj['Key'].startswith('A'):
+            # Copy the object to the target bucket
+            copy_source = {
+                'Bucket': source_bucket,
+                'Key': obj['Key']
+            }
+            s3.copy_object(
+                CopySource=copy_source,
+                Bucket=target_bucket,
+                Key=obj['Key']
+            )
+            # Delete the object from the source bucket
+            s3.delete_object(
+                Bucket=source_bucket,
+                Key=obj['Key']
+            )
+        if obj['Key'].startswith('a'):
+            # Copy the object to the target bucket
+            copy_source = {
+                'Bucket': source_bucket,
+                'Key': obj['Key']
+            }
+            s3.copy_object(
+                CopySource=copy_source,
+                Bucket=target_bucket,
+                Key=obj['Key']
+            )
+            # Delete the object from the source bucket
+            s3.delete_object(
+                Bucket=source_bucket,
+                Key=obj['Key']
+            )
+    return {
+        'statusCode': 200,
+        'body': 'Data transfer complete!'
+   }
+___________________________________________________
+
+What ever the file names ending with ".bkp" should move to another s3 bucket
+___________________________________________________
+import boto3
+def lambda_handler(event, context):
+    source_bucket = 'sourcebucket12345689'			# Replace with the actual source S3 Bucket
+    target_bucket = 'targetbucket12345577548'		# Replace with the actual target S3 Bucket
+    s3 = boto3.client('s3')
+    # List all objects in the source bucket
+    response = s3.list_objects_v2(Bucket=source_bucket)
+    # Iterate through the objects and copy those starting with "s" to the target bucket
+    for obj in response['Contents']:
+        if obj['Key'].endswith('.bkp'):
+            # Copy the object to the target bucket
+            copy_source = {
+                'Bucket': source_bucket,
+                'Key': obj['Key']
+            }
+            s3.copy_object(
+                CopySource=copy_source,
+                Bucket=target_bucket,
+                Key=obj['Key']
+            )
+            # Delete the object from the source bucket
+            s3.delete_object(
+                Bucket=source_bucket,
+                Key=obj['Key']
+            )
+    return {
+        'statusCode': 200,
+        'body': 'Data transfer complete!'
+   }
+___________________________________________________
+
+Create a lambda function to perform telnet test.  get output as "Telnet success" or "telnet failed".
+
+Once above test completed, move this with in VPC and test again... make sure to use "Python 3.12 as pythin 3.13 is not able to import telnetlib"
+___________________________________________________
+
+import telnetlib
+def lambda_handler(event, context):
+    # Set the Telnet server host and port
+    host = "google.com"
+    port = 443
+    try:
+        # Create a Telnet object
+        tn = telnetlib.Telnet(host, port, timeout=5)
+        # Telnet connection succeeded
+        tn.close()
+        return "Telnet success"
+    except Exception as e:
+        # Telnet connection failed
+        return "Telnet failed: " + str(e)
+
+==========================================
+
+connect to RDS using Lambda function.., Lambda fucntion runtime should be 3.12 to get it work..
+
+
+RDS_HOST       → Your RDS Endpoint  (e.g. mydb.xxxx.ap-south-1.rds.amazonaws.com)
+RDS_PORT       → 3306 (default MySQL port)
+RDS_USER       → DB username         (e.g. admin)
+RDS_PASSWORD   → DB password         (store in Secrets Manager for production!)
+RDS_DB_NAME    → mysql
+
+----
+
+import json
+import os
+import pymysql
+
+
+def lambda_handler(event, context):
+    """
+    AWS Lambda Function - Connect to RDS MySQL & List All Databases
+    
+    Architecture:
+        Lambda (VPC) --> RDS MySQL (Private Subnet)
+    
+    Credentials (stored in Environment Variables — never hardcode!):
+        RDS_HOST       → Your RDS Endpoint  (e.g. mydb.xxxx.ap-south-1.rds.amazonaws.com)
+        RDS_PORT       → 3306 (default MySQL port)
+        RDS_USER       → DB username         (e.g. admin)
+        RDS_PASSWORD   → DB password         (store in Secrets Manager for production!)
+        RDS_DB_NAME    → Initial DB to connect to (e.g. information_schema)
+
+    IAM Permissions Required on Execution Role:
+        - rds:DescribeDBInstances  (optional, for describing the cluster)
+        - ec2:CreateNetworkInterface, ec2:DescribeNetworkInterfaces,
+          ec2:DeleteNetworkInterface  (needed for Lambda inside VPC)
+
+    Layer Required:
+        - PyMySQL layer (or add pymysql in your deployment package)
+    """
+
+    # ── Step 1: Read DB credentials from Environment Variables ──────────────
+    rds_host     = os.environ.get("RDS_HOST")
+    rds_port     = int(os.environ.get("RDS_PORT", 3306))
+    rds_user     = os.environ.get("RDS_USER")
+    rds_password = os.environ.get("RDS_PASSWORD")
+    rds_db       = os.environ.get("RDS_DB_NAME", "information_schema")
+
+    # Basic validation
+    if not all([rds_host, rds_user, rds_password]):
+        return {
+            "StatusCode": 400,
+            "Error": "❌ Missing required environment variables: RDS_HOST, RDS_USER, RDS_PASSWORD"
+        }
+
+    connection = None
+
+    try:
+        # ── Step 2: Connect to RDS MySQL ────────────────────────────────────
+        print(f"🔌 Connecting to RDS MySQL at {rds_host}:{rds_port} ...")
+
+        connection = pymysql.connect(
+            host=rds_host,
+            port=rds_port,
+            user=rds_user,
+            password=rds_password,
+            database=rds_db,
+            connect_timeout=10       # fail fast if network/SG is misconfigured
+        )
+
+        print("✅ Connected to RDS MySQL successfully!")
+
+        # ── Step 3: Run SHOW DATABASES query ────────────────────────────────
+        with connection.cursor() as cursor:
+            cursor.execute("SHOW DATABASES;")
+            rows = cursor.fetchall()
+
+        # rows = (('information_schema',), ('myappdb',), ('mysql',), ...)
+        all_databases = [row[0] for row in rows]
+
+        # ── Step 4: Filter out MySQL system/internal databases ───────────────
+        system_dbs = {"information_schema", "mysql", "performance_schema", "sys"}
+        user_databases = [db for db in all_databases if db not in system_dbs]
+
+        # ── Step 5: Build response ───────────────────────────────────────────
+        result = {
+            "StatusCode": 200,
+            "RDSHost": rds_host,
+            "TotalDatabases": len(all_databases),
+            "AllDatabases": all_databases,
+            "UserDatabases": user_databases,        # your app DBs (non-system)
+            "SystemDatabases": list(system_dbs & set(all_databases))
+        }
+
+        print(f"📦 Found {len(all_databases)} database(s): {all_databases}")
+        print(json.dumps(result, indent=2))
+
+        return result
+
+    except pymysql.MySQLError as db_err:
+        error_msg = f"❌ MySQL Error: {str(db_err)}"
+        print(error_msg)
+        return {
+            "StatusCode": 500,
+            "Error": error_msg,
+            "Hint": "Check: RDS Security Group allows Lambda SG on port 3306, and credentials are correct."
+        }
+
+    except Exception as e:
+        error_msg = f"❌ Unexpected Error: {str(e)}"
+        print(error_msg)
+        return {
+            "StatusCode": 500,
+            "Error": error_msg
+        }
+
+    finally:
+        # ── Always close the DB connection ───────────────────────────────────
+        if connection:
+            connection.close()
+            print("🔒 DB connection closed.")

@@ -1,0 +1,107 @@
+
+SaaS : Software as a Service
+PaaS : Platform as a Service
+IaaS : Infrastructure as a Service
+
+
+Lambda Supports :
+- .net Core
+- java
+- nodejs
+- python
+- ruby
+- Amazon Linux 2023
+
+
+Assume we have python / nodejs code, you decided to run it.? 
+
+EC2 : Choose OS, Choose Instance type, Launch instance, Install required softwares, place your data and deliver..  
+
+Lambda : Choose Python/nodejs when creating lambda function and upload the code as zip file (or) upload to s3 and priovide the s3 path.. AWS runs the code.. 
+Fully managed serverless service from AWS.. 
+
+
+=======
+
+Invocation models for Python:  (When code has to run)
+
+Synchronous Invocation : The caller (LB, APIGateway, lambda function URL) sends the requests for response, lambda runs the function and return the result directly to the caller.
+
+Asynchronous Invocation : The caller (SQS, SNS, EventBridge, S3) sends the request for response, Lambda return with status code (202), Then starts the process and sends the result to the caller. If the function fails, it sends the event to DLQ (Dead Letter Queue) and retries 2 times.. 
+
+Event Source mapping : lambda polls the source for new records at service (SQS, MSK - kafka, DynamoDB) and invokes the lambda function when it finds the new records.. 
+
+
+Eventbridge : We can invoke lambda funciton based on Schedule / Event. 
+
+=====
+
+Durable Execution : Designed for long running workflows.. 
+Max timeout : 366 Days
+
+EC2 Capacity provider : lambda functions runs inside group of AWS ec2 instances. We need to create capacity provider. 
+
+=====
+
+lambda_Handler : This is the entry point to the lambda function. Execution starts here.
+
+lambda function will have 3 Phases in its lifecycle
+
+1. INIT Phase : Initialisation Phase : Download the code, Initialisae the runtime to run the code..
+2. INVOKE Phase : Execute the handler function. The Active phase of lifecycle - CODE RUN, BUSINESS LOGIC RUN..
+3. SHUTDOWN Phase : For a period of inactivity.. AWS Destroys the environment and free the resources.. 
+
+
+Cold start : INIT + INVOKE : First invoke or invoke after a long period of inactivity, Lambda starts with latency/delays.
+
+Warm start : INVOKE Phase only : Environment will be available to run the code, so we dont get high latency..
+
+How to reduce cold start time in Lambda service.?
+--> Provisioned cuncurrency
+--> SnapStart
+
+AWS SnapStart is a performance optimisation feature designed to reduse COLD START startup latency by upto 10 times. 
+
+==================
+
+Default lambda function timout : 15 Minutes
+
+Memory : memory to between 128 MB and 10240 MB
+
+
+lambda Execution Role : 
+--> Along with lambda function creation, We get an IAM role.. This will have permissions on Cloudwatch logs group to write logs about the invocations. 
+
+role should have ==> AWSLambdaBasicExecutionRole + Addl service polocies
+
+
+REPORT RequestId: ca088887-d2e7-473c-a606-3a554016099e	
+Duration: 324.20 ms	
+Billed Duration: 831 ms				--> $$
+Memory Size: 128 MB	
+Max Memory Used: 100 MB				--> $$
+Init Duration: 506.62 ms	
+
+324.20+506.62=830.82
+
+==================
+
+Some of the lambda function required support files. How we can provide such type of files to lambda funciton. 
+Example : JKS : Java Keystore files.. (.jks .keystore)
+
+Ans : lambda layers.. 
+
+==================
+
+We dont hardcode sensitive information in lambda function code
+
+Aletrnatives: 
+1. Environment Variable (less Secured)
+2. Parameter Store (Bit Secured but values cant rotate automatically)
+3. Secrets manager (More Secured and Auto rotate)
+
+==================
+
+Can we run lambda function inside a VPC.?
+Ans: yes, We can (We need to add "LambdaVPCAccessExecutionrole")
+
