@@ -1,0 +1,299 @@
+=====================================================================
+SCP 01 - DENY LEAVING THE ORGANIZATION
+=====================================================================
+Description:
+  Stops any member account from removing itself from the AWS
+  Organization. If an account leaves, it escapes ALL guardrails,
+  consolidated billing, and central security tooling.
+
+Attach to: Root (applies to every account)
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyLeaveOrganization",
+      "Effect": "Deny",
+      "Action": "organizations:LeaveOrganization",
+      "Resource": "*"
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 02 - DENY ROOT USER ACTIONS
+=====================================================================
+Description:
+  The root user of a member account has unlimited power and cannot
+  be restricted by IAM. This SCP blocks root from doing anything in
+  member accounts. Teams must use IAM Identity Center (SSO) roles.
+  (Tip: AWS now also supports "Centralized root access management"
+   to remove root credentials entirely - use both together.)
+
+Attach to: Root
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyRootUser",
+      "Effect": "Deny",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:root"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 03 - RESTRICT TO APPROVED REGIONS
+=====================================================================
+Description:
+  Allows resources to be created only in approved regions (data
+  residency, compliance, cost control, smaller attack surface).
+  Global services (IAM, CloudFront, Route 53, Organizations, STS,
+  Support, etc.) are exempted with NotAction because they run from
+  us-east-1 behind the scenes.
+
+Attach to: Workloads OU (or Root once tested)
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOutsideApprovedRegions",
+      "Effect": "Deny",
+      "NotAction": [
+        "a4b:*", "acm:*", "aws-marketplace-management:*",
+        "aws-marketplace:*", "aws-portal:*", "budgets:*", "ce:*",
+        "chime:*", "cloudfront:*", "config:*", "cur:*",
+        "directconnect:*", "ec2:DescribeRegions",
+        "ec2:DescribeTransitGateways", "ec2:DescribeVpnGateways",
+        "fms:*", "globalaccelerator:*", "health:*", "iam:*",
+        "importexport:*", "kms:*", "networkmanager:*",
+        "organizations:*", "pricing:*", "route53:*",
+        "route53domains:*", "s3:GetAccountPublic*",
+        "s3:ListAllMyBuckets", "s3:ListMultiRegionAccessPoints",
+        "s3:PutAccountPublic*", "shield:*", "sts:*", "support:*",
+        "trustedadvisor:*", "waf-regional:*", "waf:*", "wafv2:*",
+        "wellarchitected:*"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": ["ap-south-1", "us-east-1"]
+        },
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/OrgSecurityAdminRole"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 04 - PROTECT CLOUDTRAIL (AUDIT LOGS)
+=====================================================================
+Description:
+  CloudTrail is the "CCTV camera" of your AWS account. Attackers
+  try to switch it off first. This SCP prevents anyone from
+  stopping, deleting, or modifying trails.
+
+Attach to: Root
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProtectCloudTrail",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:StopLogging",
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:UpdateTrail",
+        "cloudtrail:PutEventSelectors",
+        "cloudtrail:PutInsightSelectors"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/OrgSecurityAdminRole"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 07 - PROTECT S3 ACCOUNT-LEVEL BLOCK PUBLIC ACCESS
+=====================================================================
+Description:
+  Account-level "Block Public Access" stops any S3 bucket in the
+  account from becoming public. The platform team turns it ON once;
+  this SCP makes sure nobody can turn it OFF. Most S3 data leaks
+  come from public buckets.
+
+Attach to: Root
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyChangeS3AccountPublicAccessBlock",
+      "Effect": "Deny",
+      "Action": "s3:PutAccountPublicAccessBlock",
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/OrgSecurityAdminRole"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 05 - PROTECT PLATFORM / SECURITY IAM ROLES
+=====================================================================
+Description:
+  The platform team deploys roles into every account (for example
+  OrganizationAccountAccessRole, AWSControlTowerExecution, security
+  audit roles). This SCP stops account admins from deleting or
+  editing those roles, so central access is never broken.
+
+Attach to: Root
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProtectPlatformRoles",
+      "Effect": "Deny",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:DeleteRole",
+        "iam:DeleteRolePermissionsBoundary",
+        "iam:DeleteRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePermissionsBoundary",
+        "iam:PutRolePolicy",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:UpdateRole",
+        "iam:UpdateRoleDescription"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:role/OrganizationAccountAccessRole",
+        "arn:aws:iam::*:role/AWSControlTowerExecution",
+        "arn:aws:iam::*:role/OrgSecurityAdminRole",
+        "arn:aws:iam::*:role/SecurityAuditRole"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/OrgSecurityAdminRole"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 6 - PREVENT KMS KEY DELETION
+=====================================================================
+Description:
+  If a KMS key is deleted, every piece of data encrypted with it is
+  lost FOREVER. This SCP blocks scheduling key deletion and
+  disabling keys in production accounts.
+
+Attach to: Prod OU
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyKMSKeyDeletion",
+      "Effect": "Deny",
+      "Action": [
+        "kms:ScheduleKeyDeletion",
+        "kms:DisableKey",
+        "kms:DeleteImportedKeyMaterial"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/OrgSecurityAdminRole"
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 7 - RESTRICT EC2 INSTANCE TYPES (COST CONTROL)
+=====================================================================
+Description:
+  Very common in Sandbox / Dev / Training accounts. Allows only
+  small, cheap instance families. Prevents someone accidentally
+  (or a hacker deliberately, for crypto-mining) launching large
+  GPU or metal instances.
+
+Attach to: Sandbox OU
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowOnlySmallInstanceTypes",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotLike": {
+          "ec2:InstanceType": [
+            "t3.nano", "t3.micro", "t3.small", "t3.medium",
+            "t4g.nano", "t4g.micro", "t4g.small", "t4g.medium"
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
+=====================================================================
+SCP 8 - REQUIRE MANDATORY TAGS ON EC2 LAUNCH
+=====================================================================
+Description:
+  Every EC2 instance must carry a CostCenter tag at creation time.
+  This makes cost allocation and ownership tracking possible.
+  (Tip: combine with Tag Policies in AWS Organizations to also
+   control the allowed tag VALUES.)
+
+Attach to: Workloads OU
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RequireCostCenterTagOnEC2",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "Null": {
+          "aws:RequestTag/CostCenter": "true"
+        }
+      }
+    }
+  ]
+}

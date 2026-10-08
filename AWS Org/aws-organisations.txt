@@ -1,0 +1,71 @@
+
+
+
+
+** DO NOT ENABLE THIS FEATURE in your free AWS accounts. Your account will automatically upgrade to a paid plan from a free plan if you enable this feature. **
+
+
+
+
+1. If we have 10 AWS accounts how can we manage monthly payments? 
+2. All the 10 accounts should allow users to work only in the specified region / Service limits.?
+3. How can we manage user authentication across all these accounts? 
+
+Management Account : The account where we have enabled the "AWS organisation" feature 
+- We take a dedicated account and we enable this feature. 
+- We don't run any workload on this management account. 
+- The management account gets the centralised billing for all the member accounts.
+- We have an option to apply SCP (Service Control Policies) for permissions enforcement.
+- We can integrate AWS Organisations with IAM Identity Centre for central logging and user management. 
+
+** Management account can't be changed after enabling organisation. 
+
+Sandbox / Training		: Testing / POC - Proof of Concept
+Dev						: Development
+SQA						: Quality Assurance
+UAT						: Pre-production / User Acceptance Test
+Prod					: Live Env / Open to the world / Client (B2B)
+Central logging			: Store logs of all the member accounts
+Central Networking		: Transit Gateway / HostedZones / Endpoints
+Management Account		: Where the AWS organisation option is enabled 
+
+
+OU : Organisational unit : Group of accounts which has similar characteristics.. 
+
+SCP : service control policies : SCP is a maximum permission boundary for AWS accounts in an organisation. 
+- It never grants access. 
+- It limits what IAM users can do in Member accounts, even if they have admin access. 
+- SCPs do not affect the management account. 
+- SCP DOES affect the root user of member accounts. 
+
+
+==========================
+
+IAm Identity Center : it provides a single login screen where we can log in and access multiple AWS accounts. 
+- Permission sets : set of permissions that we can apply to AWS accounts. 
+
+When user is logging into an AWS Account - What permisisons user should get (Permission Sets)
+
+IAM Identity Center : It supports multiple identity providers/source.. 
+--> Identity Center directory
+--> Active Directory
+--> idp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
