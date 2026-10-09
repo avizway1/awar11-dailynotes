@@ -1,0 +1,109 @@
+
+
+YAML has 4 golden rules.
+
+1. indentation = structure			==> YAML has no { } brackets. Spaces decide who is parent and who is the child.
+2. Spaces only						==> use 2 spaces or set VCCode to use spaces when you hit tab
+3. space after colon				==> name: avinash (valid)
+4. Case sensitive					==> Resources ≠ resources
+
+name:avinash	--> One string only
+name: avinash	--> valid key and value
+
+
+** Install YAML and cloudformation extensions in your VS Code. 
+IDE : Integrated Development Environment  : VSCode, Kiro, Cursor
+
+use AI
+
+====
+
+Key: value / Data-Types
+
+fruit: apple		#string
+price: 25			#number
+in_stock: true		#Boolean
+
+'2010-09-09'		--> It is Date without quotes. but CFT need a text
+{{resolve:ssm:}}	--> To define flowmap, we can use {
+
+
+----
+
+
+Resources					--> Level 0
+|__ MyFirstBucket			--> level 1 (logical ID)
+		|
+		|__ Type			--> AWS AWS creates
+		|
+		|__ properties
+				|
+				|__ bucketName
+
+
+---
+#Flow style with fruits
+
+fruits: [ apple, banana, kiwi ]
+
+
+---
+
+fruits_details:
+  - name: apple      #item1
+    color: red
+    price: 25
+  - name: mango     #item2
+    color: yellow
+    price: 50
+
+
+
+---
+
+#Simple YAML file
+
+fruit: apple
+price: 25
+in_stock: true	
+
+==============================================================================
+
+
+1. Resource : This is the only mandatory section. We can define what resource we want to create. 
+2. Output: pick the created resources' info. Display it as an output. 
+3. Parameters: instead of hardcoding the values we can parameterize the required information. 
+
+
+AWS::S3::Bucket
+AWS::EC2::Instance
+
+https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-template-resource-type-ref.html
+
+IaC : Infrastructure as Code
+IaC major advatange is : Reusability
+
+To Deploy CFT, we can upload template to s3 and provide URL / Direct upload from laptop / Sync from git.
+
+aws cloudformation create-stack --stack-name mys3stack --template-body file://01-s3.yaml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

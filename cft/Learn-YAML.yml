@@ -1,0 +1,72 @@
+#Simple YAML file
+fruit: apple
+price: 25
+in_stock: true	
+
+---
+#List format of fruits
+fruits:
+  - apple
+  - mango
+  - banana
+  - orange
+
+AllowedValues:      #Choice shows as dropdown when we deploy template
+  - t3.micro
+  - t3.small
+  - t4g.micro
+
+---
+#List of Map Example
+
+fruits_details:
+ apple:              #item1
+    color: red
+    price: 25
+ mango:              #item2
+    color: yellow
+    price: 50
+fruits_origin: {apple: simla, mango: andhra}
+
+SecurityGroupIngress:
+  - IpProtocol: tcp
+    FromPort: 22
+    ToPort: 22
+    CidrIp: 0.0.0.0/0
+  - IpProtocol: tcp
+    FromPort: 80
+    ToPort: 80
+    CidrIp: 0.0.0.0/0
+---
+#Nested format
+
+fruits_details:
+  - name: apple      #item1
+    color: red
+    price: 25
+  - name: mango     #item2
+    color: yellow
+    price: 50
+
+---
+# intrinsic functions
+!Ref
+!Sub
+!FindInMap
+!GetAtt
+
+fruits:
+  bestfruit: mango
+  healthyfruit: apple
+  citrusfruit: orange
+
+Avinash'sBucket:
+  FirstChoice: !Ref bestfruit
+  SecondChoice: !Ref citrusfruit
+  ThirdChoice: !Ref healthyfruit
+Anudeep'sBucket:
+  FirstChoice: !Ref healthyfruit
+  SecondChoice: !Ref citrusfruit
+  ThirdChoice: !Ref bestfruit
+Arvind'sFruitBucket:
+  FirstChoice: !Ref citrusfruit

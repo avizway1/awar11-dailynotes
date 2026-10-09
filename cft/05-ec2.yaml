@@ -1,0 +1,28 @@
+#ami-08e3b3155fc937a94
+#t3.micro
+#awar11-na
+
+Parameters:
+  InstanceType:
+    Type: String
+    Description: Choose your instance type
+    Default: t3.micro
+  
+  AvailabilityZone:
+    Type: String
+    Description: Choose required AZ
+    Default: ap-south-1a
+
+Resources:
+  MyFirstInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08e3b3155fc937a94
+      AvailabilityZone: !Ref AvailabilityZone
+      KeyName: awar11-na
+      InstanceType: !Ref InstanceType
+      
+Outputs:
+  MyEC2Id:
+    Description: Instanceid is
+    Value: !Ref MyFirstInstance
