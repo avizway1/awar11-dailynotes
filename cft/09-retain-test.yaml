@@ -1,0 +1,16 @@
+Parameters:
+  BucketName: 
+    Type: String
+    Description: Enter the bucket name you want to create in AWS Env
+
+Resources:
+  MyFirstS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName
+
+Outputs:
+  MyBucketOutputs:
+    Description: My bucket name is 
+    Value: !Ref MyFirstS3Bucket

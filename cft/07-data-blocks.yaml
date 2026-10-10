@@ -1,0 +1,62 @@
+Parameters:
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Choose a subnet that belongs to the selected VPC
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+
+  InstanceType:
+    Type: String
+    Description: Choose your instance type
+    Default: t3.micro
+    AllowedValues: 
+      - t3.micro
+      - c7i-flex.large
+
+Resources:
+
+  MySg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group created with CFT
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  MyFirstInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: MySg
+    Properties:
+      ImageId: ami-08e3b3155fc937a94
+      SubnetId: !Ref SubnetId
+      KeyName: !Ref KeyName
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds:
+        - !Ref MySg
+      Tags:
+        - Key: Name
+          Value: My-instance-Demo
+        - Key: project
+          Value: Project-X
+
+Outputs:
+  MyEC2Id:
+    Description: Instanceid is
+    Value: !Ref MyFirstInstance

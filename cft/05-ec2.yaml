@@ -1,7 +1,3 @@
-#ami-08e3b3155fc937a94
-#t3.micro
-#awar11-na
-
 Parameters:
   InstanceType:
     Type: String

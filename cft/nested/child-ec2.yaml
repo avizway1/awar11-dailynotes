@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Aviz Academy - Child Stack 2 - EC2 Instance
+
+Parameters:
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+
+  InstanceProfileName:
+    Type: String
+    Description: Received from IAM child stack via Parent
+
+Resources:
+
+  DemoSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Aviz Demo SG
+      VpcId: !Ref VpcId          # SG created in selected VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  DemoEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64}}"
+      InstanceType: t3.micro
+      SubnetId: !Ref SubnetId    # EC2 placed in same VPC's subnet
+      IamInstanceProfile: !Ref InstanceProfileName
+      SecurityGroupIds:
+        - !Ref DemoSG
+      Tags:
+        - Key: Name
+          Value: aviz-nested-ec2
+
+Outputs:
+
+  EC2InstanceId:
+    Value: !Ref DemoEC2

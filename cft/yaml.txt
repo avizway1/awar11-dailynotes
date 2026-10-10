@@ -87,8 +87,12 @@ To Deploy CFT, we can upload template to s3 and provide URL / Direct upload from
 
 aws cloudformation create-stack --stack-name mys3stack --template-body file://01-s3.yaml
 
+---
+We can pick existing resources using data block.
 
+-- If we delete the clousfrontation stack, resources created using that stack will delete cuatomatically.
 
+DeletionPolicy: Retain
 
 
 

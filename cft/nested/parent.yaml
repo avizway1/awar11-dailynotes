@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Aviz Academy - Parent Stack (Nested Stack Demo)
+
+# NOTE: Upload child-iam.yaml and child-ec2.yaml to S3 first.
+
+Parameters:
+
+  S3BucketName:
+    Type: String
+    Description: S3 bucket where child templates are uploaded
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select your VPC
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select a Subnet (must belong to the VPC selected above)
+
+Resources:
+
+  # Child Stack 1 - IAM Role
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::Region}.amazonaws.com/child-iam.yaml"
+
+  # Child Stack 2 - EC2 (receives output from IAM stack)
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: IAMStack
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL: !Sub "https://${S3BucketName}.s3.${AWS::Region}.amazonaws.com/child-ec2.yaml"
+      Parameters:
+        VpcId: !Ref VpcId
+        SubnetId: !Ref SubnetId
+        InstanceProfileName: !GetAtt IAMStack.Outputs.InstanceProfileName
+
+Outputs:
+
+  EC2InstanceId:
+    Value: !GetAtt EC2Stack.Outputs.EC2InstanceId
