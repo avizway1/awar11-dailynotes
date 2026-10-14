@@ -1,0 +1,50 @@
+Git is a version control system. It's a tool that records snapshots of our project over time so we can review history, undo mistakes, and collaborate without overwriting each developer's work. 
+
+
+1973		- SCCM	- Source code control system 	- 1 file
+			  RCM - revision control system 		- x files, 1 Directory
+			  CVS - concurrent version system 		- x files, x dire, 1 user
+			  
+2000		- SVN - subversion						- x files, x dire, x users
+
+2005		- GIT - Global Information Tracker		- branching, cherry pick
+
+
+=======
+
+https://git-scm.com/install/
+
+git config --list								: Show the existing configuration. 
+git config --global user.name "avinash"
+git config --global user.email "avinash@avizacademy.com"
+git config --global core.editor "vim"
+git config --global --edit
+
+---
+
+git init
+
+objects/		: Directory structures, compressed file content, commit histories, and tags 
+refs/			: It stores pointers to commits. 
+hooks/			: Contains customizable scripts that Git runs automatically before / after a commit / push. 
+logs/			: Keeps the history of the changes 
+info/			: Additional global files 
+
+HEAD			: Point to the current checkout branch or specific commit hash. 
+index			: The staging area where Git prepares the content for our next commit 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
