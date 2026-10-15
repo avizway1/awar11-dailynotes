@@ -20,6 +20,9 @@ git config --global user.email "avinash@avizacademy.com"
 git config --global core.editor "vim"
 git config --global --edit
 
+git config --global init.defaultBranch main		: Sets main as default branch
+
+
 ---
 
 git init
@@ -34,11 +37,124 @@ HEAD			: Point to the current checkout branch or specific commit hash.
 index			: The staging area where Git prepares the content for our next commit 
 
 
+=============================
+
+D: 15/10/2026
 
 
+git init
+
+git config --global init.defaultBranch main		: Sets main as default branch
+
+git add 							: Moves the file to staging/index area. 
+
+git add .
+git add <file-name>
+
+git rm --cached mycode.txt			: Remove the file from staging
+
+git commit -m "id - Added first file"
+
+git branch -M main					: To rename the default branch to "main"
 
 
+Traditional Git creates a branch with the name `master` but all the latest Git providers like GitHub, GitLab, and Bitbucket use the default branch name `main`. It is recommended to use `main` as a branch name over `master`. 
 
+---
+
+git log
+git log --oneline
+
+79b543b (HEAD -> main) added file2
+85ebb16 added space for testing
+b4e7e02 id - Added first file
+
+
+1. You haven't pushed your code yet... All are local commits
+
+Option A : Undo the commit, but KEEP your code changes	
+git reset HEAD~1
+
+Option B : Undo the commit and DESTROY all changes.
+git reset --hard HEAD~1
+
+----
+
+git diff b4e7e02..85ebb16			: TO compare changes happened between 2 commits
+
+====================
+
+git remote add origin https://github.com/avizway1/awar11-gitdemo.git			: Adding remote repo
+
+git push -u origin main															: push local changes		
+
+git push --set-upstream origin main	
+
+git push
+
+======================
+
+
+SSH-Authentication method:
+
+ssh-keygen -t ed25519 -C "avinash@avinash.com"
+
+/home/ec2-user/.ssh/id_ed25519
+
+eval "$(ssh-agent -s)"
+
+ssh-add ~/.ssh/id_ed25519
+
+Copy the public key content and store it in the GitHub account under GitHub Settings > SSH and GPG keys.
+
+ssh -T git@github.com
+
+===================
+
+git fetch
+git pull
+
+Generally the best method developers follow : 
+- They always fetch and pull, first before they start their day 
+- Before they are pushing their code to the remote repo. 
+
+
+===================
+
+clone : we can get a copy of our entire codebase to our local machine. 
+- Whenever you get a new laptop you need to get the entire codebase to your new laptop. 
+- Whenever any new team member joins, he needs to start work. 
+- If it is a public repository you use the "HTTPS" method to clone. 
+
+pull : when multiple team members are working on the same repository, if you want to get their changes to your local laptop, then you can run the `pull` command. 
+- Before they start their day 
+- Before they are pushing their code to the remote repo. 
+
+===================
+
+.gitignore	: A git ignore file helps to not commit unwanted files or sensitive files to the remote repository from the local repository. 
+
+node_modules
+.DS_Store
+Thumbs.db
+.git/*
+a*
+.env
+
+===================
+
+git init
+git status
+git add .
+git commit -m "msg"
+git remote add origin <url>
+git push
+
+git clone
+git fetch
+git pull
+
+git diff
 
 
 
