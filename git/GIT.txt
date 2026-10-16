@@ -157,8 +157,176 @@ git pull
 git diff
 
 
+=========================================================
+
+D: 16/10/2026
+
+Create a repository with the same name as your GitHub username. Automatically it will treat it as a special repository. 
+- When you create a README.md file inside that special repository, it will appear on our GitHub home screen. 
+- Provide all your professional info and ask GPT to prepare a .MD file.
+
+==============
+
+Branching : branching helps us to create a separate line of development to work on new features and bug fixes without touching our main codebase. 
 
 
+TBD : trunk-based development : it's GitHub's one of the development strategies:
+- We generally don't work on the main branch directly.
+- We create a branch and do all the work, like feature implementation and bug fixes.
+- Once the feature development is completed we merge the code into the main branch.
+
+
+git branch		: Shows which branch we are currently working on. 
+
+git branch feature-x
+
+git checkout <branch-name>
+
+git checkout feature-x					: Switch to feature-x branch (Traditional)
+git switch feature-x					: Switch to feature-x branch (Modern)
+
+git switch -c feature-x					: Create a branch and switch to that branch automatically
+git checkout -b feature-x				: Create a branch and switch to that branch automatically
+
+git merge								: `git merge` brings all changes together. 
+
+- switch to main branch
+- git merge <feature-x>
+
+============================
+
+In the organisation we simply don't merge our code into the main branch. All the developers create a PR (pull request). 
+- That PR should be reviewed or evaluated and approved. 
+
+git checkout -b feature-y
+
+created 2 files
+
+git add . && git commit -m "added feature-y files"
+
+git push -u origin feature-y
+
+--> Compare and create a pull request so the reviewer will review the code changes and then it merges to the main branch.
+ 
+
+============================
+
+Task : Create a file with your name in my repo. You need to create a PR.
+
+https://github.com/avizway1/awar11-gitdemo
+
+============================
+
+step 1 : create a file in our central repository. (info.txt)
+
+step 2 : clone/pull it to an EC2 instance. 
+
+git clone
+cd repo
+git checkout -b infofix
+
+vim info.txt
+
+git add . && git commit -m "Added valid info"
+
+** NOT PUSHED TO MAIN / CENTRAL REPO YET
+
+
+step 3 : ON YOUR LAPTOP, clone the repo
+
+edit the file
+
+git add . && git commit -m "Added valid info" && git push origin main
+
+---
+
+step 4 : switch back to ec2 instance
+
+git switch main
+
+git pull origin main
+
+git merge infofix
+
+we get conflict..
+
+=======================
+
+
+Hi, Good Morning..!!!
+<<<<<<< HEAD
+My Name is Anudeep
+Am working as Marketing Manager
+=======
+My Name is Avinash
+Am working as Cloud & DevOps Engineer
+>>>>>>> infofix
+have a nice day.!!!
+
+
+=======================
+=======================
+
+
+git merge : `git merge` brings all changes together. This is a very simple and safe approach for repositories where multiple developers are working (shared repositories). 
+
+
+Assume you and your frined writing a book and it has 6 chapters.. YOU: 3 chapters.. YOUR FRIEND: 3 chapters..
+
+MERGE: 
+- You wrote three chapters. 
+- Your friend wrote three chapters at the same time.
+You both decided to combine. 
+--> If you merge, It shows as you wrote 3 chapters and your friend wrote 3 chapters.
+--> Merge keeps all original commit hashes.
+
+REBASE: `git rebase` rewrites all the changes. It is not a recommended approach for shared repositories. 
+- Whenever you are working primarily in your local repositories, you can use this to reduce the commit count. 
+
+- You wrote three chapters. 
+- Your friend wrote three chapters at the same time.
+You both decided to combine. 
+--> It shows your three chapters first, then your friend's three chapters, for a clean and linear history. 
+
+
+
+THUMB RULE : never rebase shared or public repositories. It may override others' work. 
+
+
+
+=========================
+
+mkdir rebase-lab && cd rebase-lab
+
+git init
+
+echo "C1" > main.txt && git add . && git commit -m "C1"
+echo "C2" >> main.txt && git add . && git commit -m "C2"
+echo "C3" >> main.txt && git add . && git commit -m "C3"
+
+git checkout -b feature HEAD~1
+
+
+echo "D" >> feature.txt && git add . && git commit -m "D - feature work"
+echo "E" >> feature.txt && git add . && git commit -m "E - feature work"
+
+
+git log --oneline --graph --all
+
+
+* 9d1c6a6 (HEAD -> feature) E - feature work
+* 7b5f3c1 D - feature work
+| * a1cf52b (main) C3
+|/  
+* 7b47029 C2
+* 4da0eed C1
+
+
+* a22d200 (HEAD -> feature) E - feature work
+* f1b7ce1 D - feature work
+* a1cf52b (main) C3
+* 7b47029 C2
+* 4da0eed C1
 
 
 
