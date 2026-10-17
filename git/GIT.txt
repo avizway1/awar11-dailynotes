@@ -9,7 +9,6 @@ Git is a version control system. It's a tool that records snapshots of our proje
 
 2005		- GIT - Global Information Tracker		- branching, cherry pick
 
-
 =======
 
 https://git-scm.com/install/
@@ -178,9 +177,9 @@ TBD : trunk-based development : it's GitHub's one of the development strategies:
 
 git branch		: Shows which branch we are currently working on. 
 
-git branch feature-x
+- Git branch created when we perform our first commit.
 
-git checkout <branch-name>
+git branch feature-x
 
 git checkout feature-x					: Switch to feature-x branch (Traditional)
 git switch feature-x					: Switch to feature-x branch (Modern)
@@ -207,7 +206,7 @@ git add . && git commit -m "added feature-y files"
 git push -u origin feature-y
 
 --> Compare and create a pull request so the reviewer will review the code changes and then it merges to the main branch.
- 
+
 
 ============================
 
@@ -289,10 +288,11 @@ You both decided to combine.
 --> It shows your three chapters first, then your friend's three chapters, for a clean and linear history. 
 
 
-
-THUMB RULE : never rebase shared or public repositories. It may override others' work. 
-
-
+THUMB RULE : Never rebase shared or public repositories. It may override others' work. 
+- It changes commit hashes.
+- It destroys teammates' base history.
+- It multiplies duplicate commits.
+- It requires dangerous force pushing. 
 
 =========================
 
@@ -321,12 +321,87 @@ git log --oneline --graph --all
 * 7b47029 C2
 * 4da0eed C1
 
+REBASE:
 
 * a22d200 (HEAD -> feature) E - feature work
 * f1b7ce1 D - feature work
 * a1cf52b (main) C3
 * 7b47029 C2
 * 4da0eed C1
+
+======================================================================
+
+D: 17/10/2026
+
+git stash : 
+
+Imagine you are working on some changes and suddenly your team member asks you to switch to another branch to fix a very important or critical bug. 
+
+- If your changes areunfinished changes, you can't commit them but you don't want to lose them. 
+
+--> We can stash them, we can switch to other branch, once the work completed, We can switch back to our branch, Then we can unstash it.
+
+
+git stash					- stash the changes
+git stash apply				- apply the stashed changes
+git stash list				- list the stashes
+git stash show -p			- show stash content
+git stash pop				- apply and remove the stash
+git stash push -m "msg"		- create a stash with custom msg
+
+
+echo "STASH-Test" > main.txt && git add . && git commit -m "stash test"
+
+
+echo "STASH" >> main.txt && git add . && git commit -m "C2"
+
+Please commit your changes or stash them before you switch branches.
+
+=============
+
+cherry-pick : `git cherry-pick` is a command we can use to copy a specific commit from one branch and apply it in another branch. 
+
+
+
+main branch commits:
+a1cf52b (HEAD -> main) C3
+7b47029 C2
+4da0eed C1
+
+feature branch commits: 
+
+49a19b1 (HEAD -> feature) tested stashing
+a9de00f stash test
+a22d200 E - feature work
+f1b7ce1 D - feature work
+
+
+echo "cherry pick 1" >> cheery-test.txt && git add . && git commit -m "cherry test 1"
+echo "cherry pick 2" >> cheery-test.txt && git add . && git commit -m "cherry test 2"
+echo "cherry pick 3" >> cheery-test.txt && git add . && git commit -m "cherry test 3"
+
+git cherry-pick 4358d24
+
+====================
+
+We have multiple options to host git application (code is in git)..
+
+- netligy
+- vercel
+- aws amplify
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
