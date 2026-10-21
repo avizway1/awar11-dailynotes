@@ -1,0 +1,33 @@
+
+Terraform : 
+
+IaC : it's an infrastructure-as-code tool. 
+
+.tf format
+
+validate
+format
+plan
+apply
+destroy
+
+statefile : it contains information about the resource that we have in our cloud environment. 
+
+terraform init			: Initialise our working directory by downloading the required provider plugin. 
+terraform fmt			: Automatically formats code with proper indentation and spacing. 
+terrsform validate		: Checks .tf files for syntax errors. 
+terraform plan			: Shows what Terraform will create, change, or delete. This is a dry run. Won't create a resource. 
+terraform apply			: Create, update, or destroy the resources on the AWS environment. 
+terraform destroy		: Destroys or deletes the resources. 
+
+terraform apply -auto-approve : non-interactive way to apply resource. 
+
+
+
+
+aws configure (accesskey, Secretaccesskey) **
+aws login (accesskey, with temp token - 12 hours)
+
+
+
+
