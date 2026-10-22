@@ -3,6 +3,16 @@ Terraform :
 
 IaC : it's an infrastructure-as-code tool. 
 
+
+CLoudforamtion : AWS
+Terraform  : AWS, Azure, GCP.. 
+
+
+Terraform was created by Michel Hashimoto in 2014. 
+Terraform developed in GO Language.
+We write our terraform script/template in HCL language.
+It started as open source and was originally developed by HashiCorp. IBM acquired it now. 
+
 .tf format
 
 validate
@@ -15,18 +25,74 @@ statefile : it contains information about the resource that we have in our cloud
 
 terraform init			: Initialise our working directory by downloading the required provider plugin. 
 terraform fmt			: Automatically formats code with proper indentation and spacing. 
-terrsform validate		: Checks .tf files for syntax errors. 
+terraform validate		: Checks .tf files for syntax errors. 
 terraform plan			: Shows what Terraform will create, change, or delete. This is a dry run. Won't create a resource. 
 terraform apply			: Create, update, or destroy the resources on the AWS environment. 
 terraform destroy		: Destroys or deletes the resources. 
 
 terraform apply -auto-approve : non-interactive way to apply resource. 
 
-
-
-
 aws configure (accesskey, Secretaccesskey) **
 aws login (accesskey, with temp token - 12 hours)
+
+====================================================================
+
+Cloudforamtion					Terraform
+-----------------------------------------------
+parameters						Variables
+resource						Resource
+output							output
+
+
+bucket_name = "aviz-awar11-terraform"
+my-ws-private-ip = "172.31.12.54"
+my-ws-public-ip = "13.126.193.20"
+
+terraform output					: Shows the output of an already deployed template or resources. 
+terraform output my-ws-public-ip	: Shows the output of only one particular output block. 
+
+
+====================================================================
+
+Terraform meta-arguments are special configuration keys provided by the Terraform language itself rather than individual cloud providers.
+
+1. count
+2. for_each
+3. depends_on
+4. provider
+5. lifecycle : Customizes how Terraform handles the execution workflow 
+	5.1 create_before_destroy
+	5.2 prevent_destroy
+	5.3 ignore_changes
+	5.4 replace_triggered_by
+
+
+Parallelism in Terraform : by default Terraform can create, update, or destroy resources concurrently to maximise the deployment speed. It has a limit of 10 operations by default. 
+
+terraform apply --parallelism=5
+
+--------------------------------------------------------
+
+In Terraform we do have an option to destroy only one particular resource from the entire template. We can use an argument called `target` to pick the specific resource. 
+
+
+terraform state list				: Shows all the resources the current state file is monitoring or managing. 
+
+1. aws_instance.mumbai-server
+2. aws_s3_bucket.mybucket
+
+terraform state show aws_instance.mumbai-server			: Displays only one particular resource block's information managed by the state file. 
+
+terraform destroy -target=aws_instance.mumbai-server	: Delayed only one particular resource from the entire stack. 
+
+
+terraform destroy -target=aws_instance.mumbai-server -target=aws_instance.mumbai-server-2
+
+
+
+
+
+
 
 
 

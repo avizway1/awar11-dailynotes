@@ -1,0 +1,194 @@
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = "t3.small"
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+resource "aws_s3_bucket" "appbucket" {
+  bucket = "aviz-awar11-terraform"
+}
+
+output "my-ws-public-ip" {
+  value = aws_instance.webserver.public_ip
+  description = "My Web server 1 Instance public IP"
+}
+
+output "my-ws-private-ip" {
+  value = aws_instance.webserver.private_ip
+  description = "My Web server 1 Instance Private IP"
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.appbucket.bucket
+  description = "My s3 bucket name is"
+}
+
+===================================================
+
+1. count
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  count         = 2
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = "t3.small"
+  tags = {
+    Name = "WebServer-${count.index + 1}"
+  }
+}
+
+2. for_each
+---------
+
+Different configurations for different instances 
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  instance_types = {
+    dev = "t3.micro"
+    uat = "t3.small"
+  }
+}
+
+resource "aws_instance" "webserver" {
+
+  for_each = local.instance_types
+
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = each.value
+  tags = {
+    Name = "WebServer-${each.key}"
+  }
+}
+
+-----
+
+Same configuration but with different names. 
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+
+  for_each = toset(["dev-server", "uat-server"])
+
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "WebServer-${each.key}"
+  }
+}
+
+=======================================
+
+3. depends_on
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "webserver" {
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+resource "aws_s3_bucket" "appbucket" {
+  bucket = "aviz-awar11-terraform2"
+  depends_on = [ aws_instance.webserver ]
+}
+
+-----------------------
+
+4. provider
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-04394a3a96907e9ec"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "IND-WebServer-aviz5"
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+  alias = "usa-region"
+  profile = "aviz7"
+}
+
+resource "aws_instance" "usa-webserver" {
+  provider = aws.usa-region
+  ami           = "ami-08c46876c64a927b8"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "USA-WebServer-aviz7"
+  }
+}
+
+==========
+
+All 3 LIFECYCLE Example:
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-0c7632fb77f35db43"
+  instance_type = "t3.micro"
+  tags = {
+    Name = "SECOND-WebServer"
+  }
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = [ instance_type ]
+    prevent_destroy = true
+  }
+}
+
+================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
