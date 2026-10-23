@@ -88,6 +88,123 @@ terraform destroy -target=aws_instance.mumbai-server	: Delayed only one particul
 
 terraform destroy -target=aws_instance.mumbai-server -target=aws_instance.mumbai-server-2
 
+==========================================================================================
+
+D: 23/10/2026
+
+
+You created the resources using Terraform. One of the user-performed changes outside of Terraform. 
+
+Option 1 : Just verify the changes happened outside Terraform : terraform plan -refresh-only
+
+Option 2 : verify the changes and accept the changes to Terraform : terraform apply -refresh-only
+
+Option 3 : Wrong changes happend, Revert the back to original : terraform apply
+
+
+"Recreate" a corrupted resource or modified resource. 
+
+terraform apply -replace									: Replace all the resources. 
+terraform apply -replace=aws_instance.mumbai-server
+
+Recreate: Delete the old resource then create a new one. 
+
+==================
+
+Local Backend : instead of storing the TF state file in the project location, we can store the Terraform.tfstate file in a custom local path on our local laptop. 
+
+terraform init -migrate-state				: Migrate state file. 
+
+
+S3 backend
+----------
+
+terraform {
+  backend "s3" {
+    bucket = "aviz.tfstate.awar11"
+    key = "myprojectx/terraform.tfstate"
+    region = "ap-south-1"
+    use_lockfile = true
+  }
+}
+
+---------
+
+ Lock Info:
+│   ID:        8174c48d-3f66-bd3f-3271-f8d46bcb6c88
+│   Path:      aviz.tfstate.awar11/myprojectx/terraform.tfstate
+│   Operation: OperationTypeApply
+│   Who:       avizway@aviz-MacBook-Pro
+│   Version:   1.16.6
+│   Created:   2026-10-23 02:30:54.329051 +0000 UTC
+│   Info:
+
+---------
+
+We do have an option to forcefully remove the lock. (make sure to run on tf code folder)
+
+terraform force-unlock 9ff83baa-abb4-1271-9683-ef0545bdbf23
+
+--------------------
+
+Below is the best practise checklist to maintain a Terraform state file:
+1. Always use a remote backend (S3) for a team's project.
+2. Enable S3 versioning.
+3. Enable S3 bucket locking with compliance mode.
+4. Enable `use_lockfile = true` to prevent concurrent changes/applying by multiple users.
+5. Set `prevent_destroy = true` on the resource, including state storage S3 bucket.
+6. Recommended to enable block public access on the S3 bucket.
+7. Never ever edit the Terraform state file manually.
+
+------------------
+
+IMPORT EXISTING RESOURCES into TERRAFORM (old method)
+
+1. verify code block and prepare a empty resources
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbai-server" {
+  
+}
+
+2. run import command wth existing resources id
+
+terraform import aws_instance.mumbai-server i-0dc07c616ff480e95
+
+
+------------------
+
+USE IMPORT BLOCK to import existing resources into terraform
+
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+import {
+  to = aws_instance.mumbai-server
+  id = "i-0dc07c616ff480e95"
+}
+
+
+terraform plan -generate-config-out=generated.tf
+
+* This command will have lot of conflict with terraform, you need to remove some of the info from "generated.tf" file.
+- primary_network_interface
+- ipv6_address_count
+- ipv6_addresses
+
+terraform plan
+
+------------------
+
+
+
+
+
 
 
 

@@ -170,14 +170,96 @@ resource "aws_instance" "mumbai-server" {
 ================
 
 
+Storing tfstate file in custom path in your local laptop
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+terraform {
+  backend "local" {
+    path = "/Users/avizway/Desktop/tfstatelocation/terraform.tfstate"
+  }
+}
+
+resource "aws_instance" "mumbai-server" {
+  ami           = "ami-088fb12f8e8397f06"
+  instance_type = "t3.small"
+  tags = {
+    Name = "WebServer-local-tftest"
+  }
+}
 
 
+===============================
+
+connection and remote-exec option to install commands inside ec2 instance
+
+provider "aws" {
+   region = "ap-south-1"
+ }
+
+ resource "aws_instance" "mumbaiserver" {
+   ami           = "ami-088fb12f8e8397f06"
+   instance_type = "t3.small"
+   vpc_security_group_ids = ["sg-0520819dbbf4e48a9"]
+   key_name = "awar11-na"
+
+   connection {
+     type = "ssh"
+     user = "ec2-user"
+     private_key = file("/Users/avizway/Desktop/keypairs/awar11-na.pem")
+     host = self.public_ip
+   }
+
+   provisioner "remote-exec" {
+     inline = [
+       "sudo dnf install httpd -y",
+       "sudo systemctl start httpd",
+       "sudo systemctl enable httpd",
+       "echo '<h1>Hello from terraform remoteexec SSH option</h1>' | sudo tee /var/www/html/index.html"
+     ]
+   }
+
+   tags = {
+     Name = "Web-server"
+   }
+ }
+ 
+============================
+
+userdata to install commands inside ec2 instance
 
 
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "mumbaiserver" {
+  ami           = "ami-088fb12f8e8397f06"
+  instance_type = "t3.small"
+  vpc_security_group_ids = ["sg-0520819dbbf4e48a9"]
+  key_name = "awar11-na"
+
+  user_data = file("${path.module}/userdata.txt")
+
+  tags = {
+    Name = "Web-server"
+  }
+}
+
+-----------------------
+
+userdata.txt
+
+#!/bin/bash
+sudo dnf install httpd -y
+sudo systemctl start httpd
+sudo systemctl enable httpd
+echo '<h1>Hello from terraform remoteexec SSH option</h1>' | sudo tee /var/www/html/index.html
 
 
-
-
+====================================================================================
 
 
 
