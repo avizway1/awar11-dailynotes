@@ -261,11 +261,205 @@ echo '<h1>Hello from terraform remoteexec SSH option</h1>' | sudo tee /var/www/h
 
 ====================================================================================
 
+FETCH EXISTING AMI ID and Launch Instance
 
+provider "aws" {
+  region = "ap-south-1"
+}
 
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
 
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-kernel-6.18-x86_64"]
+  }
+  filter {
+    name   = "description"
+    values = ["Amazon Linux 2023*"]
+  }
+}
 
+resource "aws_instance" "mumbaiserver" {
+  ami                    = data.aws_ami.al2023.id
+  instance_type          = "t3.small"
+  vpc_security_group_ids = ["sg-0520819dbbf4e48a9"]
+  key_name               = "awar11-na"
 
+  tags = {
+    Name = "Web-server"
+  }
+}
+
+#al2023-ami-2023*-kernel-6.18-x86_64
+#Amazon Linux 2023*
+
+=========================================
+
+Fetch Existing VPC, CREATE A SG and launch ec2 instance (without dynamic block)
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_vpc" "Existingvpc" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-vpc"]
+  }
+}
+
+data "aws_subnet" "public-1a" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-subnet-public1-ap-south-1a"]
+  }
+}
+
+data "aws_subnet" "public-1b" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-subnet-public2-ap-south-1b"]
+  }
+}
+
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-kernel-6.18-x86_64"]
+  }
+  filter {
+    name   = "description"
+    values = ["Amazon Linux 2023*"]
+  }
+}
+
+resource "aws_security_group" "manual_example" {
+  name = "Manual-example"
+  description = "Custom VPC SG for Web Server"
+  vpc_id = data.aws_vpc.Existingvpc.id
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+    ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "mumbaiserver" {
+  ami           = data.aws_ami.al2023.id
+  instance_type = "t3.small"
+  subnet_id     = data.aws_subnet.public-1a.id
+  vpc_security_group_ids = [ aws_security_group.manual_example.id ]
+  key_name      = "awar11-na"
+
+  tags = {
+    Name = "Web-server"
+  }
+}
+
+==========================
+
+SAME AS ABOVE, but USING DYNAMIC BLOCK
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_vpc" "Existingvpc" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-vpc"]
+  }
+}
+
+data "aws_subnet" "public-1a" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-subnet-public1-ap-south-1a"]
+  }
+}
+
+data "aws_subnet" "public-1b" {
+  filter {
+    name   = "tag:Name"
+    values = ["project-subnet-public2-ap-south-1b"]
+  }
+}
+
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*-kernel-6.18-x86_64"]
+  }
+  filter {
+    name   = "description"
+    values = ["Amazon Linux 2023*"]
+  }
+}
+
+locals {
+  ingress_rules = [
+    { port = 22 },
+    { port = 80 },
+    { port = 443 },
+    { port = 8080 }
+  ]
+}
+
+resource "aws_security_group" "manual_example" {
+  name = "Manual-example"
+  description = "Custom VPC SG for Web Server"
+  vpc_id = data.aws_vpc.Existingvpc.id
+
+  dynamic "ingress" {
+    for_each = local.ingress_rules
+    content {
+      from_port = ingress.value.port
+      to_port = ingress.value.port
+      protocol = "tcp"
+      cidr_blocks = [ "0.0.0.0/0" ]
+    }
+  }
+}
+
+resource "aws_instance" "mumbaiserver" {
+  ami           = data.aws_ami.al2023.id
+  instance_type = "t3.small"
+  subnet_id     = data.aws_subnet.public-1a.id
+  vpc_security_group_ids = [ aws_security_group.manual_example.id ]
+  key_name      = "awar11-na"
+
+  tags = {
+    Name = "Web-server"
+  }
+}
 
 
 

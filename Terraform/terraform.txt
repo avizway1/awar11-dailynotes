@@ -199,7 +199,46 @@ terraform plan -generate-config-out=generated.tf
 
 terraform plan
 
-------------------
+=======================================================
+
+When we perform `terraform init`, the code will do four activities:
+1. It reads our provider or required provider block.
+2. Downloads the provider plugin from the Terraform registry.
+3. Stores it in the .terraform folder.
+4. It creates a terraform.lock.hcl file for version locking.
+
+
+
+= 6.0.0				==> Exactly this version only
+>= 6.0				==> This version or higher
+<= 6.0				==> This version or lower
+~> 6.0				==> 6.x only			(Commonly used)
+~> 6.60				==> 6.60 and above but not 7 
+>=5.0 <6.0			==> Any version between 5.0 and 6.0. 
+
+~> 6.0				
+
+
+terraform init
+terraform init -upgrade			- Upgrade provider to the latest allowed version. 
+
+
+
+=======================================================
+
+
+string 	:	A single text value			: t3.micro
+number	:	A numeric value				: 2
+bool	:	true or false				: true/false
+list	:	Ordered collection of same type values : ["t3.micro", "t3.small"]
+map		:	key and Value pair			: { name = "myserver", env = "dev"}
+tuple	:	mix of different types		: ["dev", 3, false]
+
+
+
+
+
+
 
 
 
