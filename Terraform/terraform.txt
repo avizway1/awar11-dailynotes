@@ -235,6 +235,95 @@ map		:	key and Value pair			: { name = "myserver", env = "dev"}
 tuple	:	mix of different types		: ["dev", 3, false]
 
 
+=======================================================
+
+
+1. CLI flag			: terraform apply -var="instance_type=t3.small"
+
+terraform plan -var="instance_type=t3.small"
+
+2. .tfvars			: 
+
+2.1 terraform.tfvars		--> Auto loads when we apply terraform plan/apply.
+
+2.2 dev.tfvars / uat.tfvars / prd.tfvars
+
+terraform apply -var-file="dev.tfvars"
+
+terraform apply -var-file="uat.tfvars"			
+terraform apply -var-file="prd.tfvars"
+
+3. environment vars	: export TF_VAR_instance_type="m5.xlarge"
+
+4. No above option is defined, Then "variables.tf" default values will be picked. 
+
+If any value, not defined anywhere, it will prompt to enter.
+
+---------
+
+Whenever we are dealing with multiple environments, we can use TF vars for separating the configurations per environment. But whenever you apply one environment on top of it, it is going to override the existing values in the existing Component resource's component configuration instead of creating another. 
+
+
+That is why we have to use "Terraform workspaces". This will segregate configurations into separate lines so it won't mix up with another environment. 
+
+
+terraform workspace list
+
+terraform workspace new dev
+terraform workspace new uat
+terraform workspace new prd
+
+terraform workspace select default
+
+---
+terraform workspace select dev
+terraform apply -var-file="dev.tfvars"
+
+---
+
+terraform workspace select uat
+terraform apply -var-file="uat.tfvars"
+
+---
+
+terraform workspace select prd
+terraform apply -var-file="prd.tfvars"
+
+---
+
+terraform workspace select dev
+terraform destroy -auto-aprrove
+
+--
+
+terraform workspace select default
+
+terraform workspace delete prd
+
+---
+
+Every workspace will have its separate TF state file. You can find it under terraform.tfstate.d, then the workspace name. There, you can find terraform.tfstate for that specific workspace. 
+
+====================================
+
+TRACE			- Captures everything - api + info + warnings + errors
+DEBUG			- API Calls + info + wanr + err
+INFO			- General operations info, Warnings + Errors
+WARN			- Warings & errors
+ERROR			- Errors only
+
+
+TF_LOG=ERROR			--> Default mode for terraform commands
+
+export TF_LOG=TRACE
+export TF_LOG=DEBUG
+export TF_LOG=INFO
+export TF_LOG=WARN
+export TF_LOG=ERROR
+
+unset TF_LOG
+
+export TF_LOG_PATH="tflogs.log"
 
 
 
