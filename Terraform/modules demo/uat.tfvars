@@ -1,3 +1,6 @@
+ami_id        = "ami-022374b883d9d7931"
 instance_type = "t3.small"
-instance_count = 2
-environment = "uat"
+name          = "uat-ec2"
+bucket_name   = "uat-testbucket-modules-demo-aviz11"
+iamuser       = "uat-iamuser"
+region        = "ap-south-1"

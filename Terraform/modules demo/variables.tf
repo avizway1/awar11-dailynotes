@@ -1,28 +1,29 @@
-variable "aws_region" {
-  description = "AWS region to deploy into"
-  type = string
-  default = "ap-south-1"
-}
-
 variable "ami_id" {
-  description = "AMI ID to launch instance"
-  type = string
-  default = "ami-022374b883d9d7931"
+  description = "AMi id to use to launch my instance"
+  type        = string
 }
 
 variable "instance_type" {
-  type = string
+  type        = string
+  description = "Instance configuration"
 }
 
-variable "key_name" {
-  type = string
-  default = "awar11-na"
+variable "name" {
+  description = "name of ec2 instance"
+  type        = string
 }
 
-variable "instance_count" {
-  type = number
+variable "bucket_name" {
+  description = "My created s3 bucket name"
+  type        = string
 }
 
-variable "environment" {
-  type = string
+variable "region" {
+  description = "aws region to deloy resources"
+  type        = string
+}
+
+variable "iamuser" {
+  description = "name of iam user"
+  type        = string
 }

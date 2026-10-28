@@ -1,3 +1,6 @@
-instance_type = "t3.micro"
-environment = "dev"
-instance_count = 1
+ami_id        = "ami-022374b883d9d7931"
+instance_type = "t3.small"
+name          = "dev-ec2"
+bucket_name   = "dev-testbucket-modules-demo-aviz11"
+iamuser       = "dev-iamuser"
+region        = "ap-south-1"

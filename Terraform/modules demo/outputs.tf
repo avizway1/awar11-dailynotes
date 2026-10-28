@@ -1,14 +1,19 @@
-output "server-public-ip" {
-  value       = aws_instance.webserver[*].public_ip
-  description = "My Web server 1 Instance public IP"
+output "instance_id" {
+  value = module.ec2.instance_id
 }
 
-output "server-private-ip" {
-  value       = aws_instance.webserver[*].private_ip
-  description = "My Web server 1 Instance Private IP"
+output "instance_public_ip" {
+  value = module.ec2.instance_public_ip
 }
 
-output "instance-id" {
-  value       = aws_instance.webserver[*].id
-  description = "The launched instance id"
+output "instance_private_ip" {
+  value = module.ec2.instance_private_ip
+}
+
+output "s3_bucket_id" {
+  value = module.s3.bucket_id
+}
+
+output "s3_bucket_arn" {
+  value = module.s3.bucket_arn
 }

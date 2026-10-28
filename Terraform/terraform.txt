@@ -326,10 +326,76 @@ unset TF_LOG
 export TF_LOG_PATH="tflogs.log"
 
 
+=============================================================================
+
+D: 28/10/2026
+
+Modules : terraform modules help us to organise infrastructure as code (IAC) code into a clean scalable folder structure. A module is a collection of related resources (example: EC2, S3). 
+
+Modules can help our project code to improve readability, reduce duplications, and help with reusability across teams or environments. 
+
+In general we will have a root module and a child module. 
+
+Root Module: this is a top-level directory where Terraform commands are executed. All .tf files in the directory collectively form the root module. 
+
+Child Module : modules called or referred to by the root module. A child module primarily contains one particular service or component. 
+Ex: we can have one module for EC2, a separate module for S3, and another module for IAM. 
 
 
+project/
+|
+|_ main.tf
+|
+|_ variables.tf
+|
+|_ modules/
+	|
+	|_ ec2/
+	|	|
+	|	|_ main.tf
+	|	|
+	|	|_ variables.tf
+	|	|
+	|	|_ output.tf
+	|
+	|_ s3/
+		|
+		|_ main.tf
+		|
+		|_ variables.tf
+		|
+		|_ output.tf
 
 
+- Every project should have only one provider block and that should be defined in the root module. (no need to define in child modules)
+- Run `terraform init` whenever we add any new module. 
+- Each child and root module requires a variables.tf file. Even if we have not set up any default values, the files and variables should be present. 
+
+
+Primarily we have four types of modules:
+
+1. Local path, where we can write and we can call it
+
+module "s3" {
+  source = "./modules/s3"
+  bucket_name = var.bucket_name
+}
+
+2. get the pre written modules from terraform registry (https://registry.terraform.io/browse/modules)
+
+module "iam_user" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-user"
+  name = var.iamuser
+}
+
+3. git reppository: We can have all our code in the git repo and we can call it.
+
+module "vpc" {
+	source = "git::https://github.com/avizway1/module-name.git"
+}
+
+
+4. HCP private registry, available to only your organisation.
 
 
 
