@@ -1,0 +1,2 @@
+ddgs>=9.16
+streamlit>=1.40

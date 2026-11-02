@@ -90,6 +90,66 @@ Amazon bedrock : it provides developers with a single unified API to build and s
 --> AI Model Catalog
 
 
+========================
+
+Inference : we can use the trained model to make predictions or decisions. 
+
+LLMs are trained on historical data. 
+
+We are going to test the trained AI model on the learned knowledge. 
+A teacher teaches a subject and a student has to take an exam on the topic relevant to what he has learned. 
+
+=================
+
+Temperature : it ranges from 0 to 1 in most of the cases. Temperature is a configuration parameter that controls an LLM's creativity and predictability of output during inference. 
+
+0.0 - 0.3 : Low temperature : deterministic and precise 
+0.5 - 0.7 : medium temperature: Balanced, a mix of accuracy and natural flow. 
+0.8 - 1.0+ : Creative and random. It chooses less predictable words but has a very high chance of hallucinations. 
+
+========================
+
+Problem with LLM : lLMs work with only historically trained data. They don't have the capabilities to fetch live data. 
+
+========================
+
+Task : Design a chatbot application with below AWS services. 
+1. Amazon bedrock	--> Invokes the bedrock
+2. Lambda			--> To perform the actual activity
+3. API Gateway		--> To handle api calls
+4. S3 Bucket		--> Hosting Frontned
+5. ACM 				--> SSL Certificate
+6. Cloudfront		--> Secure Frontend with SSL
+7. Route53			--> Application Host
+
+
+======================
+
+MCP : Model Context Protocol 
+
+FastMCP
+
+======================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
