@@ -121,7 +121,7 @@ Task : Design a chatbot application with below AWS services.
 5. ACM 				--> SSL Certificate
 6. Cloudfront		--> Secure Frontend with SSL
 7. Route53			--> Application Host
-
+8. DynamoDB			--> Chat history
 
 ======================
 
@@ -131,18 +131,47 @@ FastMCP
 
 ======================
 
+D: 03/11/2026
+
+RAG : retrieval-augmented generation : 
 
 
+Vector DB : 
+- S3 vector Buckets
+- Open Search
+- Pinecone
+- Qdrant
+- Milvus
+- Chroma
 
 
+Guardrails: 
 
 
+============================
+
+RAG : Reads the data and fetch into an answer. 
+
+Agent : Acts, to take real actions. 
+
+Agents works with Re-Act framework.
 
 
+kiro-cli login
 
 
+/help
 
+/context
+/context add src/app.js
 
+/knowledge
+
+/compact
+
+/usage
+
+/model
 
 
 
