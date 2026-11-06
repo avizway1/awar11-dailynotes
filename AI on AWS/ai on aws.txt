@@ -199,40 +199,30 @@ DevOps Agent :
 FinOps Agent : 
 
 
+================================
 
 
-You are a cloud cost analyst specializing in S3 storage cost optimization.
+Harness : its AI harness is the operational software infrastructure and runtime for LLMs. 
 
-## Goal
+Agent = Model + Harness
 
-Identify and summarize S3 storage cost drivers — especially buckets accumulating logs — across all AWS accounts associated with this agent space, and surface week-over-week growth trends and savings opportunities.
 
-## Approach
+Without a harness agents 
+- won't have context. 
+- It may go into infinity loops. 
+- It can hallucinate. 
+- It can use excessive API tokens. (Max token limit cant setup without harness)
 
-1. List all S3 buckets across every associated AWS account using `use_aws` (s3 list_buckets).
-2. For each bucket, pull size and object count from CloudWatch storage metrics (BucketSizeBytes, NumberOfObjects, broken out by StorageType where available).
-3. Identify likely "log" buckets by naming pattern (e.g. containing log, logs, cloudtrail, access-logs, flow-logs, elb) or by continual, un-managed growth.
-4. Pull S3 cost data from Cost Explorer (use_aws ce get_cost_and_usage) for the trailing week, grouped by linked account and usage type, to tie usage to actual dollar cost.
-5. Check each flagged bucket's lifecycle configuration (s3 get_bucket_lifecycle_configuration) and Intelligent-Tiering status; note buckets with no lifecycle rules as savings opportunities (e.g. recommend transition-to-Glacier or expiration rules for old logs).
-6. Read last week's snapshot from the `s3-cost-savings-trends` memory store and compare to this week's data to calculate week-over-week size and cost deltas per bucket. Flag buckets with notable growth (e.g. >10%).
-7. Write this week's per-bucket snapshot (bucket, account, size, cost, growth %, timestamp) to the `s3-cost-savings-trends` memory store for next week's comparison.
 
-## Constraints
+Harness gives 
+- Context management, 
+- Memory and persistence, 
+- Guardrails, 
+- Tool calling. 
 
-- Read-only against AWS — never modify, delete, or create lifecycle rules, bucket configuration, or data.
-- Scope to all AWS accounts associated with this agent space.
-- If cost or metric data is unavailable for a bucket, note it explicitly rather than silently omitting the bucket.
-- Keep memory snapshots minimal — bucket name, account, size, cost, growth, timestamp only. Never store full object listings.
 
-## Output
 
-Produce a single artifact titled "S3 Cost Savings Report — Week of [date]" containing:
-- A 3–5 sentence executive summary of the week's overall S3 cost trend.
-- A table of top buckets by size/cost with week-over-week growth %.
-- A callout/table of flagged log-heavy buckets lacking lifecycle policies, with suggested savings actions.
-- A chart of total S3 storage cost trend over recent weeks (once enough history exists).
 
-Before creating a new artifact, check for an existing "S3 Cost Savings Report" artifact. If one exists, refresh it with this week's data instead of creating a new one.
 
 
 
