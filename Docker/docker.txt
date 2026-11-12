@@ -1,0 +1,72 @@
+Avinash Reedy Thipparthi
+15 yrs IT Experience & 9 yrs teaching experience..
+ 
+2 years, running my own academy - Aviz Academy
+
+Miyapur - 12:30 - 5:30 PM
+
+11:30 AM You can call me - 7997777597 
+December 20th
+
+
+1. Physical Servers
+2. Virtualisation
+3. Containerization
+
+Microservices 
+
+================================================
+
+
+Physical Server : Hardware, Network, OS, librariers, Runtime, Application / Code..
+Security, Maintenance, cooling, Power COnnection/UPS, 
+problem : 	Time, Money - Upfront, 
+			Scaling - Vertical ( Adding more RAM / CPU on Same server) / Horizontal (Adding more servers).
+
+
+
+Monolith : 
+- Slow and Risky Releases - every change ships with every other change. 
+- All - or - Nothing Scaling - scale the entire application. 
+- One bug takes down everything - a memory leak in the cart module crashes payments and order services also. 
+- Locked into one technology: you struck with one language and one framework for total application. 
+
+Microservices : 
+- Independent Deployment : Payments- Deployment
+- Targeted Scaling : More load on payments- scale only payments
+- Fault isolation : if the recommendation service fails, the customer can still browse and pay. 
+- Right tool per job : python for ML, Go - apigw, Java - billing..
+- Small, owning teams
+- Easier to understand
+
+
+polyglot microservices 
+
+Websites that use microservices and that we use daily 
+- Netflix
+- Amazon
+- Uber
+- Airbnb
+- Spotify
+- X or Twitter
+- PayPal
+- LinkedIn
+- Food Delivery - swiggy / Zomato
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
