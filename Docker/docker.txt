@@ -31,6 +31,7 @@ Monolith :
 - One bug takes down everything - a memory leak in the cart module crashes payments and order services also. 
 - Locked into one technology: you struck with one language and one framework for total application. 
 
+
 Microservices : 
 - Independent Deployment : Payments- Deployment
 - Targeted Scaling : More load on payments- scale only payments
@@ -53,18 +54,147 @@ Websites that use microservices and that we use daily
 - LinkedIn
 - Food Delivery - swiggy / Zomato
 
+======================================
+
+D: 13/11/2026
 
 
+2008 - solomon hykes stats dotCloud, PaaS company.
+2013 - Docker is shown publicly at pycon and released open source.
+2014 - Docker 1.0 and DockerHub 
+2015 - OCI - Open Container Initiative: form to define an industry standard for images and runtimes. 
+
+podman - Docker compatable application.
+containerd - 
+CRI-O : a lightweight runtime built only for Kubernetes.
+
+Docker : Docker is an open platform for building, shipping, and running applications inside containers. 
+
+Docker Engine : a background service that builds and runs containers.
+
+Container : a running instance of an image. 
+- We can take all our application code. 
+- We can write instructions (Dockerfile).. 
+- Then we can build Dockerfile. 
+- We get an image. 
+- Once you run that image you get the container. 
+
+Dockerfile : a text file with steps to build an image.
+
+Image : a read-only template containing the application and its dependencies 
+
+Registry : a store for images, such as Docker Hub, ECR, or GHCR.
 
 
+Step by step process: 
+
+step 1 : Gather all the applicaiton code..
+
+step 2 : write a dockerfile..
+
+step 3 : Build the docker file, we get an image..
+
+step 4 : we can push the image to Registry (Dockerhub / ECR - Elastic Contianer Registry / GHCR - GitHub Container Registry)
+
+step 5 : We/anyone can pull the image and run it. Here we get a "Container"..
 
 
+Docker --> build --> image --> registry --> Image pull --> container
+					   |
+					   |
+					   v
+					 Container
+
+---
+
+Docker installation : 
+
+windows: 
+- Install wsl (windows subsystem for linux)
+
+https://docs.docker.com/desktop/setup/install/windows-install/
+
+- Choose "USE WSL 2 instead of Hyper-V"
+
+----
+
+sudo dnf install docker -y
+
+sudo systemctl enable --now docker
+
+sudo usermod -aG docker $USER
+
+-> signout and signin back (or) run below command
+
+newgrp docker
+
+docker --version
+docker run hello-world
+
+==============================
+
+docker images
+
+docker pull httpd
+
+docker run httpd					#Runs contianer in foreground (ctrl+c to stop)
+
+docker run -d httpd
+docker run -d --name myhttpd httpd
+
+docker ps							# list running containers only
+docker ps -a						# List all containers (runing /stopped)
+
+docker rm 52976501e0fc b9af66fae86a 8b2813abace9
+docker rm -f 52976501e0fc b9af66fae86a 8b2813abace9		# force remove
+
+docker stop myhttpd2
+docker kill heuristic_ellis
+
+docker pause myhttpd									#Freeze the contianers processes
+docker unpause myhttpd
 
 
+--> Creating a contianer or pulling a container without any tags.. 
+it picks "latest" as default option.
+
+docker run nginx							
+docker pull nginx
+
+docker pull nginx:1.30
+
+docker run mysql						#pull the image locally - if not available, then runs it.
+										#If image available in local, it picks.. if not, pull and run..
 
 
+2026-11-13 02:46:22+00:00 [ERROR] [Entrypoint]: Database is uninitialized and password option is not specified
+    You need to specify one of the following as an environment variable:
+    - MYSQL_ROOT_PASSWORD
+    - MYSQL_ALLOW_EMPTY_PASSWORD
+    - MYSQL_RANDOM_ROOT_PASSWORD
+	
+
+Passing environment variable to the container 
+
+Option 1 : Command line (-e : stays in shell history)
+
+docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=s3cret1213 mysql:latest
+	
+option 2 : Pass env variables From a file (**Preferred method and never commit it to git)
+
+docker run -d --name mysql2 --env-file ./myvars.txt mysql:latest
 
 
+** When we run the `docker inspect` command, both options (option 1 and option 2) will display the environment variable and its values so we don't use this option for very sensitive information like passwords or API keys. 
+
+----
+
+docker stats						#live cpu and memory usage per container
+
+docker inspect mysql2
+
+docker inspect --format='{{.HostConfig.Memory}}' mysql2
+docker inspect --format='{{.HostConfig.NanoCpus}}' mysql2
 
 
 
