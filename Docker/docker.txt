@@ -104,6 +104,7 @@ Docker --> build --> image --> registry --> Image pull --> container
 					   |
 					   v
 					 Container
+					 (local container)
 
 ---
 
@@ -140,7 +141,7 @@ docker pull httpd
 docker run httpd					#Runs contianer in foreground (ctrl+c to stop)
 
 docker run -d httpd
-docker run -d --name myhttpd httpd
+docker run -d --name myhttpd httpd		#Detached mode
 
 docker ps							# list running containers only
 docker ps -a						# List all containers (runing /stopped)
@@ -148,8 +149,8 @@ docker ps -a						# List all containers (runing /stopped)
 docker rm 52976501e0fc b9af66fae86a 8b2813abace9
 docker rm -f 52976501e0fc b9af66fae86a 8b2813abace9		# force remove
 
-docker stop myhttpd2
-docker kill heuristic_ellis
+docker stop myhttpd2							#graceful
+docker kill heuristic_ellis						#forceful
 
 docker pause myhttpd									#Freeze the contianers processes
 docker unpause myhttpd
@@ -195,6 +196,128 @@ docker inspect mysql2
 
 docker inspect --format='{{.HostConfig.Memory}}' mysql2
 docker inspect --format='{{.HostConfig.NanoCpus}}' mysql2
+
+NanoCpus 	: 0
+Memory 		: 0
+
+=================================================================================================
+
+D: 14/11/2026
+
+We limited a container to 128 MB of memory and 0.25 CPU. (Memory - Bytes.. CPU in billions of a core)
+
+docker run -d --name myhttpd-limit --memory=128m --cpus=0.25 httpd
+
+------------
+
+Port Mapping
+
+A container's ports are private until we map a host port to them. 
+
+-p <host-port>:<container-port>
+-p <laptop-aval-port>:<container-port>
+
+-p 80:80
+-p 8080:80
+-p 8888:80
+
+ss -tulnp		: Verify which ports the host is listening on. 
+
+docker run -d --name web1 -p 80:80 nginx
+docker run -d --name web2 -p 8080:80 nginx
+docker run -d --name web4 -p 8888:80 nginx
+
+docker run -d --name web5 -p 8088:80 httpd
+
+------------
+
+docker kill web1 web2 web4 web5 web6
+docker rm web1 web2 web4 web5 web6
+
+------------
+
+docker logs <container-name>
+docker logs <container-id>
+
+docker logs web1			#Everything the container has printed 
+docker logs -f web1			#follo live logs
+
+docker logs --tail 5 web1
+
+docker events
+docker top <container-name>		#Processes running inside the container 
+
+------------
+
+How to connect to a container
+
+docker exec -it web1 /bin/bash						#interactive shell
+docker exec -it web1 sh								#use when the image has no bash (alpine)
+
+docker exec web1 whoami								#execute command without opening shell
+docker exec -u root web1 whoami						#Execute command as a specific user
+
+docker exec web1 ls -l /usr/share/nginx/html/
+
+------------
+
+copying files in and out
+
+docker cp ./index.html web1:/usr/share/nginx/html/		#host to container copy
+docker cp ./myvars.txt web1:/usr/share/nginx/html/
+
+docker cp web1:/usr/share/nginx/html/50x.html ./		#Container to local copy
+
+------------
+
+Anything written inside a container is lost when the container is removed. If we are using volumes, it keeps data outside the container. 
+
+Named Volume: create a volume first, then use it
+
+docker volumes ls
+
+docker volume create my_data
+docker volume inspect my_data
+
+
+sudo ls /var/lib/docker/volumes/my_data/_data
+sudo su
+cd /var/lib/docker/volumes/my_data/_data
+vim index.html
+
+docker run -d --name nginx1 -p 80:80 -v my_data:/usr/share/nginx/html/ nginx
+docker run -d --name nginx2 -p 8080:80 -v my_data:/usr/share/nginx/html/ nginx
+docker run -d --name nginx3 -p 8888:80 -v my_data:/usr/share/nginx/html/ nginx
+
+---
+
+Anonymous volume : Created on the fly with a random ID 
+
+docker run -d --name nginx4 -p 8088:80 -v /usr/share/nginx/html/ nginx
+
+---
+
+bind mount : a host folder mapped straight into a container 
+
+
+docker run -d --name nginx-bind -v /home/ec2-user/mywebcontent:/usr/share/nginx/html/ -p 8088:80 nginx
+
+-----------------
+
+Named Volumes : Managed by Docker, Under /var/libdocker/volumes/.. Database files and persistent applicaiton data.. works same on any host.. 
+
+Bind Mouunt : Managed by us/you.. It is just a folder on host.. Sharing source code or sharing content.. host folder permissions maters..
+
+-----------------
+
+
+
+
+
+
+
+
+
 
 
 
