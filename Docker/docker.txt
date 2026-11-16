@@ -306,11 +306,257 @@ docker run -d --name nginx-bind -v /home/ec2-user/mywebcontent:/usr/share/nginx/
 
 Named Volumes : Managed by Docker, Under /var/libdocker/volumes/.. Database files and persistent applicaiton data.. works same on any host.. 
 
-Bind Mouunt : Managed by us/you.. It is just a folder on host.. Sharing source code or sharing content.. host folder permissions maters..
+Bind Mount : Managed by us/you.. It is just a folder on host.. Sharing source code or sharing content.. host folder permissions maters..
 
------------------
+========================================================================
+
+D: 16/11/2026
+
+Restart policies: A restart policy controls what happens when a container exists ot the host reboots.
 
 
+no					: Never restart. THis is default option.
+on-failure[:N]		: Restart only if the container exists with an error, optionally at most N times.
+always				: Always restart, including after a host reboot.
+unless-stopped		: like "always", except a container you stopped by hand stays stopped.
+
+
+docker run -d --name mynginx1 --restart=always -p 8080:80 nginx:latest
+
+docker run -d --name mynginx2 --restart=unless-stopped -p 8080:80 nginx:latest
+
+Both are in running state.. and restarted..
+
+docker stop mynginx1
+docker stop mynginx2
+
+										always							unless-stopped
+										-----------						-----------------
+Container crashed						restart automatically			restart automatically
+Host rebooted - container running		restart automatically			restart automatically
+Host rebooted - You stoped container	starts again					stays stopped
+
+===================================
+
+bridge : The default. A container gets private IP addresses on a virtual network inside the host. 
+
+host : container shares the host network directly: no separate IP, no port mapping. 
+
+none : No network at all.
+
+
+docker network create mycustomnw
+
+with-in the network:
+docker run -dit --name c1 --network mycustomnw alpine
+docker run -dit --name c2 --network mycustomnw alpine
+
+outside of the network
+
+docker run -dit --name outnw alpine
+
+** Containers can reach other containers by name only on a network we created.
+
+-----
+
+Running a contianer in host mode:
+
+docker run -d --name host-test --network host nginx
+
+docker run -d --name host-test2 --network host nginx
+
+docker logs host-test2
+
+----
+
+Bridge Mode: 
+Will have its own IP address inside the Docker network 
+-p parameter required for port mapping.
+Traffic passes through NAT so one extra hop is added. 
+More isolated containers won't expose unless we publish on a port. 
+Best for normal and multi-container applications. 
+Works on Linux, Mac, and Windows. 
+
+Host Mode: 
+It shares the host IP address and port. 
+Port mapping not required. 
+Less isolation: our container directly exposed over the host network 
+Slightly faster as there is no NAT and one less hop.
+We can use for monitoring, agent, and networking tools. 
+Supports only Linux. 
+
+=======================================================================================
+
+docker container prune				#remove all stopped containers
+docker image prune					#remove dangling (untagged) images
+docker image prune -a				#remove every image not used by a container
+docker network prune				#remove unused networks
+docker volume prune	-a				#remove unused volumes
+
+docker system prune -a				#unused contianers, netowkrs and images in one go.
+docker system prune --volumes		# the same + plus unused volumes (except images)
+
+docker rm -f $(docker ps -aq)		** Use with caution. Force-remove every container, running or stopped. 
+
+=======================================================================================
+
+
+A Dockerfile is a recipe for an image. Each instruction adds a layer. 
+
+-----
+
+FROM 		: Set the base image. This must be the first instruction in the Dockerfile. 
+
+FROM alpine
+FROM ubuntu:latest
+FROM python:3.13-alpine
+FROM node:22
+FROM amazonlinux
+FROM redhat/ubi8:1221212 (universal base image)
+
+---
+
+RUN			: Execute a command while the image is being built. 
+
+RUN dnf update -y && dnf install nginx -y && dnf clean all
+
+** To follow best practise while writing your Dockerfile, reduce the layers. 
+Chain commands with && to keep layers count few. 
+
+---
+
+WORKDIR		: Sets the work directory for all the subsequent commands we are going to execute. 
+
+WORKDIR /app
+WORKDIR /usr/share/nginx/html/
+WORKDIR /var/www/html/
+
+----
+
+COPY		: It copies files from the build folder into the image.  
+
+COPY . .
+COPY src/ /app
+COPY . /usr/share/nginx/html/
+
+COPY <source-path> <container-path>
+
+---
+
+ADD			: Similar to `copy` but it also supports zip files. Generally we use `copy` most of the time. 
+
+ADD mydata.tar.gz /app
+
+---
+
+CMD			: CMD sets the default command to run when a container starts. CMD will be overridden if we pass an argument while running the `docker run` command. 
+
+
+CMD["nginx","-g","daemon off;"]
+
+FROM amazonlinux:latest
+CMD["echo", "hello from AVINASH"]			--> I build and named it as "myapp"
+
+Not passing any argument while we are running the image
+docker run myapp							Output: "hello from AVINASH"
+
+We are passing arguments while we are running the image so PASSING arguments will override default arguments. 
+
+docker run myapp "hello from ANUDEEP"		Output: hello from ANUDEEP
+docker run myapp date								"Nov 16 2026"
+
+---
+
+ENTRYPOINT	: We can define a command that always runs even if we pass any argument when running the Docker `run` command. 
+
+
+FROM amazonlinux:latest
+ENTRYPOINT["echo", "hello from AVINASH"]			--> I build and named it as "myapp"
+
+Not passing any argument while we are running the image
+docker run myapp							Output: "hello from AVINASH"
+
+We are passing arguments while we are running the image so PASSING arguments will override default arguments. 
+
+docker run myapp "hello from ANUDEEP"		Output: hello from AVINASH hello from ANUDEEP
+docker run myapp date								hello from AVINASH, "Nov 16 2026"
+
+----
+
+
+FROM python:3.13
+ENTRYPOINT["python"]
+CMD["app.py"]						--> We build this and named as "python-app"
+		
+docker run python-app				output: python app.py
+docker run python-app web.py		output: python web.py
+
+--------------------
+
+EXPOSE 	: We document which port the container is listening on. (This is not going to publish or open the port. We still need to pass `-p` to run our container.)
+
+EXPOSE 80
+EXPOSE 3000
+EXPOSE 5000
+EXPOSE 3306
+
+---
+
+USER	: Sets the user for the running container. 
+
+** It is highly recommended to run any container as a non-root user to reduce the attack surface. 
+All subsequent commands mentioned in the Dockerfile run with the user we are setting up now. 
+
+---
+
+VOLUME	: We can create a mount point for shared data or persistent data. 
+
+VOLUME /var/lib/mysql/
+VOLUME /usr/share/nginx/html/
+
+---
+
+ENV		: We can set the environment variables. 
+
+ENV APP_ENV=uat
+ENV NAME=demoapp
+
+---
+
+LABEL	: Adds metadata such as maintainer or version 
+
+LABEL maintainer='Avinash'
+LABEL version="1.0"
+
+---
+
+SHELL	: We can change the default shell os Base OS.
+
+SHEEL ["/bin/bash"]
+
+---
+
+HEALTHCHECK		: We can tell Docker how to test whether the container is healthy. 
+
+HEALTHCEHCK CMD curl http://localhost/ || exit 1
+
+---
+
+ARG			: A variable available only during the build, not at runtime 
+
+ARG APP_VERSION:1.0
+
+---
+
+STOPSIGNAL		: Sets the system call signal that is sent to the container on exit. 
+
+---
+
+Task : Ask chatgpt to generate dockerfile for diff programing languages i.e; python, go, nodejs, ruby.. 
+
+create an account in hub.docker.com
+
+--
 
 
 
