@@ -559,10 +559,96 @@ create an account in hub.docker.com
 --
 
 
+========================================================================
 
 
+Interview: the Uber image size is huge. How do you reduce its size? 
+
+1. Use a minimal base image like Alpine, slim, or distroless.
+2. Use a multi-stage build.
+3. Add a .dockerignore file to ignore unnecessary files.
+4. Combine run commands and clean package cache in the same layer.
+
+============
+
+Make sure you are in the location where dockerfile is present
+
+docker build -t tttgame .
+docker run -d -p 5000:5000 --name tttgame tttgame:latest
+
+docker ps
+
+http://<instance-ip>:5000
+
+-----------
+
+Interview: you have a Docker image. This has to be shared with another device. There is no internet access to these two devices. 
+
+#server-1
+docker save -o tttgame.tar tttgame:latest
+
+scp tttgame.tar ec2-user@<server-2>:/home/ec2-user/
+
+#server-2
+docker load -i tttgame.tar
+
+----------
+
+Sometimes the Docker engine may not support containers running on some of the CPU architectures. For example you cannot run some images on ARM64 if they are built on AMD64. 
 
 
+buildx : this extends Docker build with the BuildKit feature. The main use of BuildX is to build one image that works on both Intel/AMD (amd64) and Graviton or Apple Silicon (arm64) machines. 
+
+
+login to docker hub and create a repo (public / private)
+
+docker login
+
+docker buildx build --push --platform linux/amd64,linux/arm64 -t avizway/tttapp:latest .
+#error
+
+----
+
+1. Create a new Buildx builder
+
+docker buildx create \
+  --name multiarch-builder \
+  --driver docker-container \
+  --use
+
+
+2. Initialize BuildKit
+
+docker buildx inspect --bootstrap
+
+3. Verify
+
+docker buildx ls
+
+---
+
+4. THis step Build multiarchitecture image and push it to dockerhub.
+
+docker buildx build --push --platform linux/amd64,linux/arm64 -t avizway/tttapp:latest .
+
+
+==========================
+
+- If you are working on a single stage, everything is in the same base image. 
+
+FROM python:3.12
+
+- Whenever we are using multi-stage we can have a builder stage as an initial stage. We can build the prerequisites or the dependency files. Then we can copy the final output to another stage and we can run our application there. 
+
+FROM python:3.13 AS builder
+
+
+FROM python:3.13 
+
+COPY --from=builder 
+
+
+docker buildx build --push --platform linux/amd64,linux/arm64 -t avizway/tttapp:multi .
 
 
 
