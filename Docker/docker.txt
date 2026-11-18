@@ -651,7 +651,61 @@ COPY --from=builder
 docker buildx build --push --platform linux/amd64,linux/arm64 -t avizway/tttapp:multi .
 
 
+==============================================================================
 
+D: 18/11/2026
+
+If we have multiple containers to deliver an application, running the `docker run` command for every container is difficult and hard to perform. 
+
+Compose : it's a single YAML file that describes all containers of our application. One command can start them all. 
+
+
+sudo mkdir -p /usr/libexec/docker/cli-plugins
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m) -o /usr/libexec/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+
+=================================================
+
+
+docker compose up
+docker compose up -d						#start containers in detached mode
+docker compose up -d --build				#Build/rebuild the images first, the start containers
+docker compose stop
+docker compose start
+docker compose up -d adminer				#start only one service
+docker compose restart						#all cotnainers will restart
+docker compose restart adminer				#only adminer will restart
+docker compose down							#stop and remove containers
+docker compose down -v						#removes the volumes aswell
+docker compose down --rmi all				#also deletes the images used by the project
+
+docker compose logs
+docker compose images
+docker compose ls							#config file on this machiene for project
+
+docker compose build --no-cache adminer		#clean rebuild
+
+========================================
+
+Pre-Req: configure an IAM user on your local laptop. 
+
+step 1 : Authenticate to ECR service
+
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 992189742322.dkr.ecr.ap-south-1.amazonaws.com
+
+step 2 : build the image / make sure to build your image first with buildx. 
+
+docker build -t tttapp .
+
+avizway/tttapp:multi
+
+Step 3 : add required tags to the image
+
+docker tag avizway/tttapp:multi 992189742322.dkr.ecr.ap-south-1.amazonaws.com/tttapp:multi
+
+step 4 : Push the image to ECR Registry
+
+docker push 992189742322.dkr.ecr.ap-south-1.amazonaws.com/tttapp:multi
 
 
 

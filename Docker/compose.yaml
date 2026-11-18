@@ -1,0 +1,20 @@
+services:
+  mydb:
+    image: postgres:14.25-alpine3.24
+    environment:
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: avinash123
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mydb
+volumes:
+  pgdata:
