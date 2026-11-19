@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Amazon ECS Managed Instances - IAM roles, ECS cluster, security group and a
+  Managed Instances capacity provider (set as the cluster default).
+  Task definitions, tasks and services are created separately.
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: mi-demo-cluster
+    Description: Name of the ECS cluster to create
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the managed instances
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnets (pick 2+ AZs) where ECS launches managed instances
+  CapacityOptionType:
+    Type: String
+    Default: ON_DEMAND
+    AllowedValues: [ON_DEMAND, SPOT]
+    Description: Launch On-Demand or Spot instances
+  MinVCpu:
+    Type: Number
+    Default: 2
+  MaxVCpu:
+    Type: Number
+    Default: 4
+  MinMemoryMiB:
+    Type: Number
+    Default: 4096
+  MaxMemoryMiB:
+    Type: Number
+    Default: 16384
+  StorageSizeGiB:
+    Type: Number
+    Default: 30
+    Description: Data volume size per instance (GiB)
+
+Resources:
+  # ---------- IAM: role ECS assumes to launch/manage EC2 for you ----------
+  InfrastructureRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'ecsInfraRoleMI-${AWS::StackName}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonECSInfrastructureRolePolicyForManagedInstances
+
+  # ---------- IAM: role used by the ECS agent on each instance ----------
+  # Name MUST start with "ecsInstanceRole" (infra policy only allows iam:PassRole on ecsInstanceRole*)
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'ecsInstanceRole-${AWS::StackName}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonECSInstanceRolePolicyForManagedInstances
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub 'ecsInstanceRole-${AWS::StackName}'
+      Roles:
+        - !Ref InstanceRole
+
+  # ---------- Network ----------
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS Managed Instances - outbound only (add ingress from your ALB)
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-mi-sg'
+
+  # ---------- ECS ----------
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  ManagedInstancesCapacityProvider:
+    Type: AWS::ECS::CapacityProvider
+    DependsOn: InstanceProfile
+    Properties:
+      Name: !Sub 'mi-cp-${ClusterName}'
+      ClusterName: !Ref Cluster
+      ManagedInstancesProvider:
+        InfrastructureRoleArn: !GetAtt InfrastructureRole.Arn
+        PropagateTags: CAPACITY_PROVIDER
+        InstanceLaunchTemplate:
+          Ec2InstanceProfileArn: !GetAtt InstanceProfile.Arn
+          CapacityOptionType: !Ref CapacityOptionType
+          Monitoring: BASIC
+          NetworkConfiguration:
+            Subnets: !Ref SubnetIds
+            SecurityGroups:
+              - !Ref InstanceSecurityGroup
+          StorageConfiguration:
+            StorageSizeGiB: !Ref StorageSizeGiB
+          InstanceRequirements:
+            VCpuCount:
+              Min: !Ref MinVCpu
+              Max: !Ref MaxVCpu
+            MemoryMiB:
+              Min: !Ref MinMemoryMiB
+              Max: !Ref MaxMemoryMiB
+      Tags:
+        - Key: Project
+          Value: !Ref AWS::StackName
+
+  ClusterCapacityProviders:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      Cluster: !Ref Cluster
+      CapacityProviders:
+        - !Ref ManagedInstancesCapacityProvider
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: !Ref ManagedInstancesCapacityProvider
+          Weight: 1
+
+Outputs:
+  ClusterName:
+    Value: !Ref Cluster
+  CapacityProviderName:
+    Description: Use this in your service's capacity provider strategy
+    Value: !Ref ManagedInstancesCapacityProvider
+  SecurityGroupId:
+    Description: Use this in your service's awsvpc network configuration
+    Value: !Ref InstanceSecurityGroup
+  SubnetIds:
+    Value: !Join [',', !Ref SubnetIds]
+  InfrastructureRoleArn:
+    Value: !GetAtt InfrastructureRole.Arn
+  InstanceProfileArn:
+    Value: !GetAtt InstanceProfile.Arn

@@ -1,0 +1,114 @@
+
+
+
+What does an orchestrator do? 
+- Scheduling and deployment
+- Auto-scaling
+- Auto-healing
+- Zero-downtime updates
+
+Popular container orchestrators are:
+- Kubernetes, also referred to as K8s
+- Amazon ECS, AWS's own managed service
+- Amazon EKS, Kubernetes-compatible AWS managed service
+- Red Hat OpenShift, on top of Kubernetes with extra developer and security tools
+- Docker Swarm. It's from Docker, for smaller setups, and suits, not for, enterprise-grade workload.
+
+----------------
+
+ECS : Elastic Contianer Service
+
+Capacity providers : 
+- fargate : AWS manages the servers.. We dont have option to choose instance type.. OS Patching / AMI update will be taken care by AWS.. Not visible in our accounts..
+Billing: Per vCPU
+
+- ECS on EC2 (Self Managed) - We manages the servers.. We can choose the instance type.. OS Patching / AMI update should be taken care by us.. 
+Billing: Ec2 Instance pricing
+- Hardest to manage
+
+- ECS Managed Instances - AWS manages the instances, Visible in our acocunts..  We can choose the instance type.. OS Patching / AMI update will be taken care by AWS.. 
+Billing: EC2 Cost + Management fee
+
+- ECS Anywhere - we can use our own hardware to run the containers. ECS acts as a control plane or orchestrator but the actual workload runs on our own hardware. 
+
+----------------
+
+1. Cluster 
+2. Task Definition
+3. Task
+4. Service
+
+
+
+
+Container Insights with enhanced observability : Provides detailed health and performance metrics at task and container level in addition to aggregated metrics at cluster and service level. Enables easier drill downs for faster problem isolation and troubleshooting.
+
+Container Insights : Provides aggregated metrics at cluster and service level. You can run deep dive analysis with logs insights analytics.
+
+Turned off : Provides default CloudWatch metrics only.
+
+===========================
+
+Task definition : it's a blueprint of our task with information like image information, CPU/memory information, logging information, port mapping information, and volume information. 
+
+
+
+
+Task role : if our container is required to access any of the AWS services in our account, we can create a role and add it here. 
+
+Make sure to add below policy to the role we are creating. This helps to connect to the running contianers..
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "ssmmessages:*",
+            "Resource": "*"
+        }
+    ]
+}
+
+
+Task execution role : ecsTaskExecutionRole : basic or essential permissions to run a container and pull the image from ECR.. 
+
+===============
+
+
+Essential container: 
+
+YES : if any container has failed in the task, the entire task will be marked as a failure. All other containers will stop. 
+NO : if any of the containers has failed, the remaining containers work normally but that particular task won't stop. 
+
+================
+
+Task : Container : this is similar to a container. This is technically a wrapper for the container. In ECS we cannot directly run a container. We have to run it as a task. A task contains a container. 
+
+K8s : Pod : in Kubernetes directly, we cannot run a container so we have a wrapper around it called a pod. A pod contains a container. 
+
+================
+
+An individual task cannot scale automatically due to any reason. If one of the tasks is down, a new task won't be created automatically. 
+
+===============
+
+Service : a service can maintain the desired number of tasks. Also a service can be integrated with a load balancer and auto-scaling groups. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
