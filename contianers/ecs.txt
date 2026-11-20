@@ -76,7 +76,6 @@ Task execution role : ecsTaskExecutionRole : basic or essential permissions to r
 
 ===============
 
-
 Essential container: 
 
 YES : if any container has failed in the task, the entire task will be marked as a failure. All other containers will stop. 
@@ -96,14 +95,81 @@ An individual task cannot scale automatically due to any reason. If one of the t
 
 Service : a service can maintain the desired number of tasks. Also a service can be integrated with a load balancer and auto-scaling groups. 
 
+==================================================================================================
+
+D: 20/11/2026
 
 
+Containers will always run with temporary or ephemeral storage. If a container dies, whatever data we have inside that, it will be deleted. 
 
 
+ELB-SG : http, https : 0.0.0.0/0
+
+TAsk- APP-SG : http, https : ELB-SG
+		 SSH : VPCCIDR
+		  
+EFS-SG : NFS : APP-SG 		: /usr/share/nginx/html/
+
+---
+
+step 1 : create a VPC with two public subnets, two private subnets, no NAT gateway. 
 
 
+Step 2 : create the required security group for our project components. 
+
+sg-0eeaaa6ca9563d0c3 - CAPSTONE-ECS-ELB-SG
+sg-0ad0e44984fc8484f - CS-ECS-TASK-APP-SG
+sg-0c53aa922c3cf55d4 - CS-ECS-EFS-SG
+
+Step 2 : create EFS in our custom VPC to store all our web content and we are going to mount this to the /usr/share/nginx/html path. 
+
+Step 3 : create EFS in our custom VPC to store all our web content and we are going to mount this to the /usr/share/nginx/html path. 
+
+3.1 Create access point
+
+aws efs create-access-point \
+  --region ap-south-1 \
+  --file-system-id fs-07c52f1ffacb7816c \
+  --posix-user Uid=101,Gid=101 \
+  --root-directory 'Path=/site,CreationInfo={OwnerUid=101,OwnerGid=101,Permissions=0755}' \
+  --tags Key=Name,Value=todo-web-ap
+
+4. Create adynamodb table.
+table name: tasks
+Primary key: id			(string)
 
 
+4. Use the dockerfile and build, push it to ECR service.
+
+** Make sure you have mutiarch build for docker desktop..
+
+docker buildx build --push --platform linux/amd64,linux/arm64 -t 992189742322.dkr.ecr.ap-south-1.amazonaws.com/todo-nginx:latest .
+
+5. Create VPC endpoints..  (or) JUST create a NAT Gateway provide internet to private subnet resources.
+ 
+- ECR DKR Endpoint
+- ECR API endpoint
+- logs (cloudwatch)
+- S3 gateway endpoint (image layers)
+- EFS / Elastic File System 
+- DynamoDB endpoint 
+
+Pre-req: Create a sg for endpoints
+
+Open https for VPC CIDR range.. 
+sg-0f1d10c6af13abf19 - VPC-ENDPOINT_SG
+
+
+6. Create an IAM role and make sure the role have DynamoDb permissions. Also include ssmmessages for ecs-exec.
+
+Task role: ecs-capstone-awar11 
+
+7. Create a task definition, make sure to have EFS mounted to task definition.
+
+* By default how much storage will an ECS task get? Ans: 20 Gb 
+(It's ephemeral, meaning temporary, and dies or is deleted with the container)
+
+8. Crete a LoadBalancer
 
 
 
