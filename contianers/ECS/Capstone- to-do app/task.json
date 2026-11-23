@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Submit project-x report",
+    "description": "Final version of the batch 10 project report",
+    "dueDate": "2026-08-30",
+    "status": "pending",
+    "createdAt": "2026-08-25T09:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "title": "Pay electricity bill",
+    "description": "",
+    "dueDate": "2026-09-05",
+    "status": "completed",
+    "createdAt": "2026-09-01T10:15:00.000Z"
+  },
+  {
+    "id": 3,
+    "title": "Plan weekend trip",
+    "description": "Book train tickets and hotel",
+    "dueDate": "2026-09-20",
+    "status": "pending",
+    "createdAt": "2026-09-02T18:30:00.000Z"
+  }
+]

@@ -1,0 +1,879 @@
+<title>Fargate Two-Container Runbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ground:#EEF1F6;
+  --surface:#FFFFFF;
+  --surface-2:#F7F9FC;
+  --ink:#131924;
+  --ink-soft:#54607A;
+  --ink-faint:#8892A6;
+  --accent:#A6540A;
+  --accent-ink:#8A4508;
+  --accent-wash:#FBF0E3;
+  --rule:#33507A;
+  --line:#D6DDE8;
+  --line-soft:#E5EAF2;
+  --warn:#9E2B1E;
+  --warn-wash:#FBECE9;
+  --ok:#26614A;
+  --ok-wash:#E7F1EC;
+  --code-bg:#151B27;
+  --code-ink:#DCE3EF;
+  --code-dim:#7E8CA5;
+  --shadow:0 1px 2px rgba(19,25,36,.06),0 8px 24px -16px rgba(19,25,36,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F131C;
+    --surface:#171D28;
+    --surface-2:#1D2431;
+    --ink:#E7ECF4;
+    --ink-soft:#A2AEC2;
+    --ink-faint:#77839A;
+    --accent:#E8A25C;
+    --accent-ink:#F0B478;
+    --accent-wash:#2A2016;
+    --rule:#6D8CC0;
+    --line:#2A3342;
+    --line-soft:#222A37;
+    --warn:#E88476;
+    --warn-wash:#2C1A17;
+    --ok:#77BFA0;
+    --ok-wash:#152720;
+    --code-bg:#0B0F17;
+    --code-ink:#D6DEEC;
+    --code-dim:#6C7A93;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F131C;
+  --surface:#171D28;
+  --surface-2:#1D2431;
+  --ink:#E7ECF4;
+  --ink-soft:#A2AEC2;
+  --ink-faint:#77839A;
+  --accent:#E8A25C;
+  --accent-ink:#F0B478;
+  --accent-wash:#2A2016;
+  --rule:#6D8CC0;
+  --line:#2A3342;
+  --line-soft:#222A37;
+  --warn:#E88476;
+  --warn-wash:#2C1A17;
+  --ok:#77BFA0;
+  --ok-wash:#152720;
+  --code-bg:#0B0F17;
+  --code-ink:#D6DEEC;
+  --code-dim:#6C7A93;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Serif",Georgia,serif;
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.sans{font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif}
+code,kbd,pre,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* ---------- masthead ---------- */
+.masthead{
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:100% 28px, 28px 100%;
+  background-position:-1px -1px;
+}
+.masthead-in{max-width:1180px;margin:0 auto;padding:44px 32px 38px}
+.eyebrow{
+  font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.eyebrow::after{content:"";height:1px;flex:1;background:var(--line);max-width:260px}
+h1{
+  font-size:clamp(30px,4.4vw,46px);line-height:1.08;font-weight:700;
+  letter-spacing:-.022em;margin:0 0 14px;text-wrap:balance;max-width:20ch;
+}
+.standfirst{font-size:18px;color:var(--ink-soft);max-width:62ch;margin:0 0 26px}
+.facts{
+  display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);
+  border-radius:3px;background:var(--surface-2);overflow:hidden;max-width:720px;
+}
+.fact{padding:11px 18px;border-right:1px solid var(--line);flex:1 1 auto}
+.fact:last-child{border-right:0}
+.fact dt{
+  font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 3px;
+}
+.fact dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:500;color:var(--ink)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px 110px;display:grid;grid-template-columns:216px minmax(0,1fr);gap:56px;align-items:start}
+.rail{position:sticky;top:24px;padding-top:36px;font-family:"IBM Plex Sans",sans-serif}
+.rail-h{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 12px}
+.rail ol{list-style:none;margin:0 0 22px;padding:0;border-left:1px solid var(--line)}
+.rail li a{
+  display:flex;gap:9px;padding:5px 0 5px 13px;margin-left:-1px;
+  border-left:2px solid transparent;color:var(--ink-soft);
+  text-decoration:none;font-size:13px;line-height:1.35;
+}
+.rail li a:hover{color:var(--ink)}
+.rail li a.on{color:var(--accent-ink);border-left-color:var(--accent);font-weight:600}
+.rail li a .n{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-faint);flex:none;width:15px}
+.rail li a.on .n{color:var(--accent)}
+.rail li a.done .n::after{content:"✓";color:var(--ok)}
+.rail li a.done .n{font-size:0}
+main{padding-top:36px;min-width:0}
+.col{max-width:70ch}
+
+/* ---------- config bar ---------- */
+.config{
+  background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--rule);
+  border-radius:3px;padding:18px 20px;margin-bottom:44px;box-shadow:var(--shadow);
+}
+.config h2{margin:0 0 4px;font-size:14px;font-weight:600;letter-spacing:-.005em}
+.config p{margin:0 0 15px;font-size:14px;color:var(--ink-soft)}
+.fields{display:flex;flex-wrap:wrap;gap:16px}
+.field{flex:1 1 190px;min-width:0}
+.field label{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+.field input{
+  width:100%;padding:8px 11px;border:1px solid var(--line);border-radius:2px;
+  background:var(--surface-2);color:var(--ink);
+  font-family:"IBM Plex Mono",monospace;font-size:13.5px;
+}
+.field input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+
+/* ---------- diagram ---------- */
+figure{margin:0 0 44px}
+figure svg{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+figcaption{font-size:13.5px;color:var(--ink-soft);margin-top:9px;font-style:italic}
+
+/* ---------- sections ---------- */
+h2.sec{
+  font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:0 0 20px;padding-bottom:9px;border-bottom:1px solid var(--line);
+}
+.step{margin:0 0 52px;scroll-margin-top:20px}
+.step-head{display:flex;gap:15px;align-items:flex-start;margin-bottom:7px}
+.step-n{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  color:var(--accent);background:var(--accent-wash);border:1px solid var(--accent);
+  width:27px;height:27px;border-radius:2px;display:grid;place-items:center;flex:none;margin-top:3px;
+}
+.step h3{margin:0;font-size:22px;font-weight:600;letter-spacing:-.014em;line-height:1.25;text-wrap:balance}
+.lede{color:var(--ink-soft);margin:0 0 18px 42px;font-size:15.5px}
+.step-body{margin-left:42px}
+p{margin:0 0 15px}
+.step-body > :last-child{margin-bottom:0}
+
+/* ---------- breadcrumb ---------- */
+.crumbs{
+  display:flex;flex-wrap:wrap;align-items:center;gap:7px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;
+  padding:9px 12px;background:var(--surface-2);border:1px solid var(--line);
+  border-left:3px solid var(--rule);border-radius:2px;margin-bottom:18px;
+}
+.crumbs b{font-weight:600;color:var(--ink)}
+.crumbs span{color:var(--ink-soft)}
+.crumbs i{color:var(--ink-faint);font-style:normal}
+
+/* ---------- spec table ---------- */
+.spec{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:14px}
+.spec th{
+  text-align:left;font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);
+  padding:0 12px 7px 0;border-bottom:1px solid var(--line);
+}
+.spec td{padding:8px 12px 8px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.spec td:first-child{font-family:"IBM Plex Sans",sans-serif;font-size:13.5px;color:var(--ink-soft);width:40%}
+.spec td:last-child{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);word-break:break-word}
+.spec td em{font-family:"IBM Plex Serif",serif;font-style:italic;color:var(--ink-faint);font-size:13.5px}
+.tw{overflow-x:auto}
+
+/* ---------- code ---------- */
+.codewrap{position:relative;margin:0 0 18px}
+pre{
+  margin:0;background:var(--code-bg);color:var(--code-ink);
+  padding:15px 17px;border-radius:3px;overflow-x:auto;
+  font-size:13px;line-height:1.62;border:1px solid var(--line);
+}
+pre code{color:inherit;background:none;padding:0;font-size:inherit}
+.copy{
+  position:absolute;top:8px;right:8px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.08);color:var(--code-dim);
+  border:1px solid rgba(255,255,255,.16);border-radius:2px;
+  padding:4px 9px;cursor:pointer;transition:color .15s,background .15s;
+}
+.copy:hover{color:var(--code-ink);background:rgba(255,255,255,.15)}
+.copy.done{color:#7FCFA6;border-color:#7FCFA6}
+p code,li code,td code,.spec code{
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  padding:1px 5px;border-radius:2px;font-size:.88em;color:var(--accent-ink);
+}
+.v{color:var(--accent-ink);font-weight:500}
+pre .v{color:#F0B478;font-weight:500}
+
+/* ---------- callouts ---------- */
+.note,.warn,.ok{
+  border-left:3px solid var(--rule);background:var(--surface-2);
+  padding:13px 16px;margin:0 0 18px;font-size:14.5px;
+}
+.warn{border-left-color:var(--warn);background:var(--warn-wash)}
+.ok{border-left-color:var(--ok);background:var(--ok-wash)}
+.note b,.warn b,.ok b{
+  font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;display:block;margin-bottom:4px;
+}
+.note b{color:var(--rule)} .warn b{color:var(--warn)} .ok b{color:var(--ok)}
+.note p:last-child,.warn p:last-child,.ok p:last-child{margin-bottom:0}
+
+/* ---------- checklist ---------- */
+.check{list-style:none;margin:0 0 18px;padding:0}
+.check li{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:15px}
+.check input{margin:5px 0 0;accent-color:var(--accent);width:15px;height:15px;flex:none}
+.done-mark{opacity:.5;text-decoration:line-through}
+
+/* ---------- step complete toggle ---------- */
+.mark{
+  display:inline-flex;align-items:center;gap:7px;margin-left:42px;margin-top:4px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-faint);cursor:pointer;
+}
+.mark input{accent-color:var(--ok);width:14px;height:14px}
+
+/* ---------- misc ---------- */
+ol.plain{padding-left:20px;margin:0 0 18px}
+ol.plain li{margin-bottom:7px}
+ul.plain{padding-left:19px;margin:0 0 18px}
+ul.plain li{margin-bottom:6px}
+.tag{
+  font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;
+  background:var(--accent-wash);color:var(--accent-ink);border:1px solid var(--accent);
+  white-space:nowrap;
+}
+.trouble{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:18px}
+.trouble th{
+  text-align:left;font-family:"IBM Plex Sans",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);
+  padding:0 14px 8px 0;border-bottom:1px solid var(--line);
+}
+.trouble td{padding:11px 14px 11px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.trouble td:first-child{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--warn);width:34%}
+footer{
+  max-width:1180px;margin:0 auto;padding:26px 32px 70px;
+  border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-faint);
+}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;gap:0;padding:0 20px 80px}
+  .rail{position:static;padding-top:28px}
+  .rail ol{display:flex;flex-wrap:wrap;gap:2px 0;border-left:0;border-top:1px solid var(--line);padding-top:8px}
+  .rail li a{padding:4px 11px 4px 9px;border-left:0}
+  .rail li a.on{border-left:0;background:var(--accent-wash);border-radius:2px}
+  .masthead-in{padding:32px 20px 28px}
+  .lede,.step-body,.mark{margin-left:0}
+  .step-head{gap:11px}
+  footer{padding:24px 20px 60px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="masthead">
+  <div class="masthead-in">
+    <div class="eyebrow">Aviz Academy · Batch 10 · Lab 07</div>
+    <h1>Deploy a two-container app on ECS Fargate</h1>
+    <p class="standfirst">A click-by-click console runbook. You will put a Node.js frontend and a DynamoDB Local database into one Fargate task, keep the database file on EFS, and prove the data survives when the task is destroyed.</p>
+    <dl class="facts">
+      <div class="fact"><dt>Console only</dt><dd>no CloudFormation</dd></div>
+      <div class="fact"><dt>Time</dt><dd>45–60 min</dd></div>
+      <div class="fact"><dt>Running cost</dt><dd>~$1.20 / day</dd></div>
+      <div class="fact"><dt>Teardown</dt><dd>step 12</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Steps">
+    <p class="rail-h">Runbook</p>
+    <ol id="nav"></ol>
+  </nav>
+
+  <main>
+    <div class="col">
+
+      <section class="config">
+        <h2 class="sans">Your values</h2>
+        <p>Fill these in once. Every command and field below updates to match.</p>
+        <div class="fields">
+          <div class="field">
+            <label for="acct">AWS account ID</label>
+            <input id="acct" value="111122223333" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="reg">Region</label>
+            <input id="reg" value="ap-south-1" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="proj">Name prefix</label>
+            <input id="proj" value="todo" spellcheck="false" autocomplete="off">
+          </div>
+        </div>
+      </section>
+
+      <figure>
+        <svg viewBox="0 0 720 260" role="img" aria-label="One Fargate task containing a frontend container and a DynamoDB Local container, with the database file stored on EFS">
+          <rect x="0" y="0" width="720" height="260" fill="var(--surface)"/>
+          <rect x="46" y="30" width="628" height="112" rx="3" fill="none" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="60" y="24" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-faint)">ECS Fargate task — awsvpc — one shared network namespace</text>
+
+          <rect x="76" y="56" width="216" height="62" rx="3" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="92" y="80" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="var(--ink)">frontend</text>
+          <text x="92" y="99" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-soft)">Node.js · port 3000</text>
+
+          <line x1="292" y1="87" x2="424" y2="87" stroke="var(--accent)" stroke-width="1.5"/>
+          <polygon points="424,87 416,83.5 416,90.5" fill="var(--accent)"/>
+          <text x="358" y="79" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--accent)">localhost:8000</text>
+
+          <rect x="428" y="56" width="216" height="62" rx="3" fill="var(--surface-2)" stroke="var(--line)"/>
+          <text x="444" y="80" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="var(--ink)">database</text>
+          <text x="444" y="99" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-soft)">DynamoDB Local · uid 1000</text>
+
+          <line x1="536" y1="118" x2="536" y2="176" stroke="var(--rule)" stroke-width="1.5"/>
+          <polygon points="536,176 532.5,168 539.5,168" fill="var(--rule)"/>
+          <text x="548" y="152" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-soft)">NFS 2049</text>
+
+          <rect x="428" y="178" width="216" height="56" rx="3" fill="var(--accent-wash)" stroke="var(--accent)"/>
+          <text x="444" y="201" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" fill="var(--accent-ink)">EFS</text>
+          <text x="444" y="220" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--accent-ink)">/ddbdata/shared-local-instance.db</text>
+
+          <line x1="14" y1="87" x2="76" y2="87" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <text x="16" y="79" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-faint)">:3000</text>
+        </svg>
+        <figcaption>Both containers share one network namespace, which is why the app reaches the database on <code>localhost</code>. EFS is the only part that outlives the task.</figcaption>
+      </figure>
+
+      <h2 class="sec">Before you start</h2>
+      <ul class="check" id="pre">
+        <li><input type="checkbox" id="p1"><label for="p1">An AWS account with administrator access, and the console open in one region you will use throughout.</label></li>
+        <li><input type="checkbox" id="p2"><label for="p2">Docker Desktop running on your machine — you build the image locally and push it to ECR.</label></li>
+        <li><input type="checkbox" id="p3"><label for="p3">The AWS CLI installed and configured (<code>aws sts get-caller-identity</code> should return your account).</label></li>
+        <li><input type="checkbox" id="p4"><label for="p4">The app source, including its <code>Dockerfile</code>. You run the build from that folder.</label></li>
+        <li><input type="checkbox" id="p5"><label for="p5">A default VPC in your region with at least two public subnets in different Availability Zones.</label></li>
+      </ul>
+
+      <h2 class="sec">The runbook</h2>
+
+      <!-- 1 -->
+      <section class="step" id="s1">
+        <div class="step-head"><div class="step-n">1</div><h3>Create the ECR repository</h3></div>
+        <p class="lede">A private registry for your frontend image. Fargate cannot pull from your laptop.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>Amazon ECR</b><i>&rsaquo;</i><span>Repositories</span><i>&rsaquo;</i><span>Create repository</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Visibility settings</td><td>Private</td></tr>
+            <tr><td>Repository name</td><td><span class="v" data-v="proj">todo</span>-app</td></tr>
+            <tr><td>Everything else</td><td><em>leave at defaults</em></td></tr>
+          </table></div>
+          <p>Choose <b class="sans">Create</b>. Copy the repository URI it shows you — it is the value you will paste into the task definition.</p>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s1"> Mark complete</label>
+      </section>
+
+      <!-- 2 -->
+      <section class="step" id="s2">
+        <div class="step-head"><div class="step-n">2</div><h3>Build and push the image</h3></div>
+        <p class="lede">The only part of this runbook that is not console clicking.</p>
+        <div class="step-body">
+          <p>The repository page has a <b class="sans">View push commands</b> button. Use these instead — they are the same commands with one important change.</p>
+          <div class="codewrap"><button class="copy">Copy</button><pre><code>aws ecr get-login-password --region <span class="v" data-v="reg">ap-south-1</span> \
+  | docker login --username AWS \
+    --password-stdin <span class="v" data-v="acct">111122223333</span>.dkr.ecr.<span class="v" data-v="reg">ap-south-1</span>.amazonaws.com</code></pre></div>
+          <div class="codewrap"><button class="copy">Copy</button><pre><code>docker buildx build --platform linux/amd64 --push \
+  -t <span class="v" data-v="acct">111122223333</span>.dkr.ecr.<span class="v" data-v="reg">ap-south-1</span>.amazonaws.com/<span class="v" data-v="proj">todo</span>-app:latest .</code></pre></div>
+          <div class="warn">
+            <b>Why not the console's own command</b>
+            <p>The console gives you a plain <code>docker build</code>. On an Apple Silicon Mac that produces an arm64 image, and Fargate defaults to x86 — the task then fails with <code>image Manifest does not contain descriptor matching platform</code>. <code>--platform linux/amd64</code> is what prevents it.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s2"> Mark complete</label>
+      </section>
+
+      <!-- 3 -->
+      <section class="step" id="s3">
+        <div class="step-head"><div class="step-n">3</div><h3>Create two security groups</h3></div>
+        <p class="lede">Order matters: the second one refers to the first.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>EC2</b><i>&rsaquo;</i><span>Security Groups</span><i>&rsaquo;</i><span>Create security group</span></div>
+          <p><b class="sans">First</b> — the group the task itself runs in:</p>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Name</td><td><span class="v" data-v="proj">todo</span>-task-sg</td></tr>
+            <tr><td>VPC</td><td><em>your default VPC</em></td></tr>
+            <tr><td>Inbound rule</td><td>Custom TCP · port 3000 · source 0.0.0.0/0</td></tr>
+            <tr><td>Outbound</td><td><em>leave the default allow-all</em></td></tr>
+          </table></div>
+          <p><b class="sans">Second</b> — the group on the EFS mount targets:</p>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Name</td><td><span class="v" data-v="proj">todo</span>-efs-sg</td></tr>
+            <tr><td>VPC</td><td><em>the same VPC</em></td></tr>
+            <tr><td>Inbound rule</td><td>NFS · port 2049 · source <span class="v" data-v="proj">todo</span>-task-sg</td></tr>
+          </table></div>
+          <div class="note">
+            <b>Read the second rule out loud</b>
+            <p>The source is a security group, not a CIDR. It says "only something running in the task's security group may mount this file system" — which is tighter than any IP range you could write, and it keeps working when the task's IP changes.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s3"> Mark complete</label>
+      </section>
+
+      <!-- 4 -->
+      <section class="step" id="s4">
+        <div class="step-head"><div class="step-n">4</div><h3>Create the EFS file system</h3></div>
+        <p class="lede">This is the disk the database file lives on. Use the Customize flow, not the one-click Create.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>EFS</b><i>&rsaquo;</i><span>File systems</span><i>&rsaquo;</i><span>Create file system</span><i>&rsaquo;</i><span>Customize</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Page</th><th>Setting</th></tr>
+            <tr><td>1 · Name</td><td><span class="v" data-v="proj">todo</span>-dynamodb-data</td></tr>
+            <tr><td>1 · Storage class</td><td>Regional</td></tr>
+            <tr><td>1 · Automatic backups</td><td>Uncheck <em>(a POC does not need it, and it bills)</em></td></tr>
+            <tr><td>1 · Throughput mode</td><td>Bursting</td></tr>
+            <tr><td>2 · VPC</td><td><em>your default VPC</em></td></tr>
+            <tr><td>2 · Mount targets</td><td>Remove the <code>default</code> security group from every row, add <span class="v" data-v="proj">todo</span>-efs-sg instead</td></tr>
+            <tr><td>3 · File system policy</td><td><em>skip</em></td></tr>
+          </table></div>
+          <p>Create it, then copy the <b class="sans">File system ID</b> — it looks like <code>fs-0abc123456789def0</code>. You need it in step 8.</p>
+          <div class="warn">
+            <b>Do not skip the mount target page</b>
+            <p>If a subnet has no mount target, a task that lands in that subnet cannot mount EFS and dies with <code>ResourceInitializationError</code>. Leave a mount target in every AZ whose subnet your service will use.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s4"> Mark complete</label>
+      </section>
+
+      <!-- 5 -->
+      <section class="step" id="s5">
+        <div class="step-head"><div class="step-n">5</div><h3>Create the EFS access point</h3></div>
+        <p class="lede">The single most error-prone screen in this runbook. Every number here matters.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>EFS</b><i>&rsaquo;</i><span>Access points</span><i>&rsaquo;</i><span>Create access point</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>File system</td><td><span class="v" data-v="proj">todo</span>-dynamodb-data</td></tr>
+            <tr><td>Name</td><td>dynamodb-local</td></tr>
+            <tr><td>Root directory path</td><td>/ddbdata</td></tr>
+            <tr><td>POSIX user · User ID</td><td>1000</td></tr>
+            <tr><td>POSIX user · Group ID</td><td>1000</td></tr>
+            <tr><td>Root creation · Owner user ID</td><td>1000</td></tr>
+            <tr><td>Root creation · Owner group ID</td><td>1000</td></tr>
+            <tr><td>Root creation · Permissions</td><td>0755</td></tr>
+          </table></div>
+          <p>Copy the <b class="sans">Access point ID</b> — <code>fsap-0abc123456789def0</code>.</p>
+          <div class="warn">
+            <b>Why 1000, and what happens if you get it wrong</b>
+            <p>An access point squashes <em>every</em> file operation to one POSIX user, so that user has to be the one the container actually runs as. Inside the DynamoDB Local image that user is <code>dynamodblocal</code>, uid <b>1000</b>. Use any other number and the container starts, looks healthy for a few seconds, then loops forever on <code>unable to open database file</code>.</p>
+            <p>This number is per-image, not universal. The same lab with PostgreSQL needs <b>70</b> for <code>postgres:16-alpine</code> and <b>999</b> for the Debian <code>postgres:16</code>.</p>
+          </div>
+          <div class="note">
+            <b>Root creation settings only apply once</b>
+            <p>They are used the first time <code>/ddbdata</code> is created and never again. If you get the ownership wrong and fix the access point afterwards, point it at a <em>new</em> path — the old directory keeps its old owner.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s5"> Mark complete</label>
+      </section>
+
+      <!-- 6 -->
+      <section class="step" id="s6">
+        <div class="step-head"><div class="step-n">6</div><h3>Create the log group</h3></div>
+        <p class="lede">Thirty seconds now, or a task that refuses to start with no visible reason later.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>CloudWatch</b><i>&rsaquo;</i><span>Log groups</span><i>&rsaquo;</i><span>Create log group</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Log group name</td><td>/ecs/<span class="v" data-v="proj">todo</span>-ecs-poc</td></tr>
+            <tr><td>Retention setting</td><td>1 week</td></tr>
+          </table></div>
+          <div class="note">
+            <b>Why this is its own step</b>
+            <p>The ECS task-definition <em>form</em> creates this group for you. The JSON editor you are about to use does not, and the standard execution role has no permission to create it either. A missing log group stops the task before your code ever runs — and because there is no log group, there is nothing to read.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s6"> Mark complete</label>
+      </section>
+
+      <!-- 7 -->
+      <section class="step" id="s7">
+        <div class="step-head"><div class="step-n">7</div><h3>Check the task execution role</h3></div>
+        <p class="lede">Skip this if <code>ecsTaskExecutionRole</code> already exists in your account — most do.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>IAM</b><i>&rsaquo;</i><span>Roles</span><i>&rsaquo;</i><span>Create role</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Trusted entity type</td><td>AWS service</td></tr>
+            <tr><td>Use case</td><td>Elastic Container Service &rsaquo; Elastic Container Service Task</td></tr>
+            <tr><td>Permissions policy</td><td>AmazonECSTaskExecutionRolePolicy</td></tr>
+            <tr><td>Role name</td><td>ecsTaskExecutionRole</td></tr>
+          </table></div>
+          <div class="note">
+            <b>This role is not your application's identity</b>
+            <p>It belongs to the ECS agent, and it does two things: pull the image from ECR and write logs. Your app never uses it. If you later switch to the managed DynamoDB service, you add a <em>task role</em> — a separate thing — for the app itself.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s7"> Mark complete</label>
+      </section>
+
+      <!-- 8 -->
+      <section class="step" id="s8">
+        <div class="step-head"><div class="step-n">8</div><h3>Create the cluster</h3></div>
+        <p class="lede">On Fargate a cluster is just a name to group things under. Nothing is provisioned.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>Amazon ECS</b><i>&rsaquo;</i><span>Clusters</span><i>&rsaquo;</i><span>Create cluster</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Cluster name</td><td><span class="v" data-v="proj">todo</span>-ecs-poc-cluster</td></tr>
+            <tr><td>Infrastructure</td><td>AWS Fargate (serverless) — leave checked</td></tr>
+            <tr><td>Monitoring / Tags</td><td><em>leave off</em></td></tr>
+          </table></div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s8"> Mark complete</label>
+      </section>
+
+      <!-- 9 -->
+      <section class="step" id="s9">
+        <div class="step-head"><div class="step-n">9</div><h3>Create the task definition</h3></div>
+        <p class="lede">Two containers, one volume. Use the JSON editor — the form cannot express all of this cleanly.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>Amazon ECS</b><i>&rsaquo;</i><span>Task definitions</span><i>&rsaquo;</i><span>Create new task definition with JSON</span></div>
+          <p>Replace everything in the editor with the following. Three values need editing: the two EFS ids from steps 4 and 5, and your account number if you did not fill it in at the top of this page.</p>
+          <div class="codewrap"><button class="copy">Copy</button><pre><code>{
+  "family": "<span class="v" data-v="proj">todo</span>-ecs-poc",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<span class="v" data-v="acct">111122223333</span>:role/ecsTaskExecutionRole",
+  "volumes": [
+    {
+      "name": "dynamodb-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-REPLACE-ME",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": { "accessPointId": "fsap-REPLACE-ME" }
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "database",
+      "image": "public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:latest",
+      "essential": true,
+      "user": "1000:1000",
+      "command": ["-jar","DynamoDBLocal.jar","-sharedDb","-dbPath","/home/dynamodblocal/data"],
+      "mountPoints": [
+        { "sourceVolume": "dynamodb-data", "containerPath": "/home/dynamodblocal/data" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/<span class="v" data-v="proj">todo</span>-ecs-poc",
+          "awslogs-region": "<span class="v" data-v="reg">ap-south-1</span>",
+          "awslogs-stream-prefix": "database"
+        }
+      }
+    },
+    {
+      "name": "frontend",
+      "image": "<span class="v" data-v="acct">111122223333</span>.dkr.ecr.<span class="v" data-v="reg">ap-south-1</span>.amazonaws.com/<span class="v" data-v="proj">todo</span>-app:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 3000, "protocol": "tcp" }],
+      "environment": [
+        { "name": "DDB_ENDPOINT", "value": "http://localhost:8000" },
+        { "name": "DDB_TABLE",    "value": "Tasks" },
+        { "name": "AWS_REGION",   "value": "<span class="v" data-v="reg">ap-south-1</span>" }
+      ],
+      "dependsOn": [{ "containerName": "database", "condition": "START" }],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/<span class="v" data-v="proj">todo</span>-ecs-poc",
+          "awslogs-region": "<span class="v" data-v="reg">ap-south-1</span>",
+          "awslogs-stream-prefix": "frontend"
+        }
+      }
+    }
+  ]
+}</code></pre></div>
+          <div class="warn">
+            <b>The <code>command</code> line is not optional</b>
+            <p>The DynamoDB Local image defaults to <code>-inMemory</code>. Leave that in place and everything appears to work — the app runs, tasks save, nothing errors — and then every deploy silently starts from an empty table, with your EFS volume mounted and untouched. <code>-sharedDb</code> matters too: without it the file name is derived from the caller's access key and region, so a change in either quietly opens a different, empty database.</p>
+          </div>
+          <div class="note">
+            <b>Four details worth pausing on</b>
+            <ul class="plain">
+              <li><code>"user": "1000:1000"</code> matches the access point from step 5.</li>
+              <li>The frontend reaches the database at <code>localhost:8000</code> because containers in one task share a network namespace.</li>
+              <li>Port 8000 is never published anywhere — the database is unreachable from outside the task.</li>
+              <li><code>dependsOn ... START</code> only waits for the container to launch. The app retries its connection for about a minute, which covers the rest.</li>
+            </ul>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s9"> Mark complete</label>
+      </section>
+
+      <!-- 10 -->
+      <section class="step" id="s10">
+        <div class="step-head"><div class="step-n">10</div><h3>Create the service</h3></div>
+        <p class="lede">The service is what keeps one task running and replaces it when it dies.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>Amazon ECS</b><i>&rsaquo;</i><span>Clusters</span><i>&rsaquo;</i><span><span class="v" data-v="proj">todo</span>-ecs-poc-cluster</span><i>&rsaquo;</i><span>Services</span><i>&rsaquo;</i><span>Create</span></div>
+          <div class="tw"><table class="spec">
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Compute options</td><td>Launch type</td></tr>
+            <tr><td>Launch type</td><td>FARGATE</td></tr>
+            <tr><td>Application type</td><td>Service</td></tr>
+            <tr><td>Task definition family</td><td><span class="v" data-v="proj">todo</span>-ecs-poc</td></tr>
+            <tr><td>Service name</td><td><span class="v" data-v="proj">todo</span>-ecs-poc-service</td></tr>
+            <tr><td>Desired tasks</td><td>1</td></tr>
+            <tr><td>Deployment options &rsaquo; Min running tasks</td><td>0%</td></tr>
+            <tr><td>Deployment options &rsaquo; Max running tasks</td><td>100%</td></tr>
+            <tr><td>Networking &rsaquo; VPC</td><td><em>your default VPC</em></td></tr>
+            <tr><td>Networking &rsaquo; Subnets</td><td><em>two public subnets, different AZs</em></td></tr>
+            <tr><td>Networking &rsaquo; Security group</td><td><em>use existing</em> — <span class="v" data-v="proj">todo</span>-task-sg</td></tr>
+            <tr><td>Networking &rsaquo; Public IP</td><td>Turned on</td></tr>
+            <tr><td>Load balancing</td><td><em>none</em></td></tr>
+          </table></div>
+          <div class="warn">
+            <b>0% minimum is deliberate</b>
+            <p>DynamoDB Local is one SQLite file and only one container may write it. The default 100% minimum would start a replacement task <em>before</em> stopping the old one, and both would fight over the same file. Setting the minimum to 0% stops the old task first. The cost is a few seconds of downtime on every deploy, which is the correct trade for a single-writer database — and it is also why desired count stays at 1.</p>
+          </div>
+          <p>Choose <b class="sans">Create</b>. The service takes two to four minutes to reach a running task.</p>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s10"> Mark complete</label>
+      </section>
+
+      <!-- 11 -->
+      <section class="step" id="s11">
+        <div class="step-head"><div class="step-n">11</div><h3>Open the app, then prove EFS works</h3></div>
+        <p class="lede">Two things to demonstrate: that it runs, and that the data is not inside the container.</p>
+        <div class="step-body">
+          <div class="crumbs"><b>Amazon ECS</b><i>&rsaquo;</i><span>Clusters</span><i>&rsaquo;</i><span>Tasks</span><i>&rsaquo;</i><span><em>the running task</em></span><i>&rsaquo;</i><span>Networking</span></div>
+          <p>Copy the <b class="sans">Public IP</b> and open <code>http://&lt;that-ip&gt;:3000</code>. Add two or three tasks in the UI.</p>
+          <p>Now destroy the container the data appears to live in:</p>
+          <ol class="plain">
+            <li>Go to the <b class="sans">Tasks</b> tab, select the running task, choose <b class="sans">Stop</b>.</li>
+            <li>Watch the service start a replacement — two minutes or so.</li>
+            <li>Open the <em>new</em> task and copy its <b class="sans">Public IP</b>. It will be a different address.</li>
+            <li>Browse to the new IP on port 3000.</li>
+          </ol>
+          <div class="ok">
+            <b>What you should see</b>
+            <p>Your tasks are still there, with the same ids and timestamps. Nothing was written to the container — the replacement mounted the same EFS directory and picked up exactly where the old one left off. Remove EFS from this design and that list comes back empty every single time.</p>
+          </div>
+          <div class="note">
+            <b>The IP changes every replacement</b>
+            <p>That is normal without a load balancer, and it is the honest reason to put an ALB in front of a real service. For a classroom demo it is a feature: it makes visible that the task really was destroyed and rebuilt.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s11"> Mark complete</label>
+      </section>
+
+      <!-- 12 -->
+      <section class="step" id="s12">
+        <div class="step-head"><div class="step-n">12</div><h3>Tear it down</h3></div>
+        <p class="lede">In this order. Each item blocks the one above it.</p>
+        <div class="step-body">
+          <div class="tw"><table class="spec">
+            <tr><th>Console</th><th>Delete</th></tr>
+            <tr><td>ECS &rsaquo; Services</td><td>Update desired tasks to 0, then delete the service</td></tr>
+            <tr><td>ECS &rsaquo; Clusters</td><td><span class="v" data-v="proj">todo</span>-ecs-poc-cluster</td></tr>
+            <tr><td>ECS &rsaquo; Task definitions</td><td>Deregister every revision of <span class="v" data-v="proj">todo</span>-ecs-poc</td></tr>
+            <tr><td>EFS &rsaquo; Access points</td><td>dynamodb-local</td></tr>
+            <tr><td>EFS &rsaquo; File systems</td><td><span class="v" data-v="proj">todo</span>-dynamodb-data</td></tr>
+            <tr><td>EC2 &rsaquo; Security Groups</td><td><span class="v" data-v="proj">todo</span>-efs-sg first, then <span class="v" data-v="proj">todo</span>-task-sg</td></tr>
+            <tr><td>CloudWatch &rsaquo; Log groups</td><td>/ecs/<span class="v" data-v="proj">todo</span>-ecs-poc</td></tr>
+            <tr><td>ECR &rsaquo; Repositories</td><td><span class="v" data-v="proj">todo</span>-app</td></tr>
+          </table></div>
+          <div class="warn">
+            <b>Deleting the file system deletes the data</b>
+            <p>There is no undo and no snapshot unless you turned automatic backups on in step 4. Take a screenshot of the app first if you want the evidence for your notes.</p>
+          </div>
+        </div>
+        <label class="mark"><input type="checkbox" data-step="s12"> Mark complete</label>
+      </section>
+
+      <h2 class="sec">When it does not work</h2>
+      <p>Start at <b class="sans">ECS &rsaquo; Clusters &rsaquo; Tasks &rsaquo;</b> the stopped task. The <b class="sans">Stopped reason</b> field and the per-container <b class="sans">Details</b> tab name the cause almost every time. Logs are at <b class="sans">CloudWatch &rsaquo; Log groups &rsaquo;</b> <code>/ecs/<span class="v" data-v="proj">todo</span>-ecs-poc</code>.</p>
+      <div class="tw"><table class="trouble">
+        <tr><th>What you see</th><th>What it means</th></tr>
+        <tr>
+          <td>unable to open database file <em>— on repeat, in the database logs</em></td>
+          <td>The access point uid does not match the image. Step 5 must be <b>1000</b>. Fixing the access point is not enough if <code>/ddbdata</code> already exists — point it at a new path.</td>
+        </tr>
+        <tr>
+          <td>Task list is empty after every deploy, no errors anywhere</td>
+          <td>The <code>command</code> override in step 9 is missing, so DynamoDB Local is running <code>-inMemory</code> and ignoring your EFS volume entirely.</td>
+        </tr>
+        <tr>
+          <td>ResourceInitializationError: failed to invoke EFS utils</td>
+          <td>The task cannot reach the file system. Check that <span class="v" data-v="proj">todo</span>-efs-sg allows 2049 from <span class="v" data-v="proj">todo</span>-task-sg, and that a mount target exists in the AZ the task landed in.</td>
+        </tr>
+        <tr>
+          <td>CannotPullContainerError</td>
+          <td>Either the public IP is off (a task in a public subnet needs one to reach ECR), or the execution role is missing, or the image is the wrong architecture — see step 2.</td>
+        </tr>
+        <tr>
+          <td>Task goes straight to STOPPED with no logs at all</td>
+          <td>The log group does not exist. Go back to step 6.</td>
+        </tr>
+        <tr>
+          <td>Waiting for DynamoDB (attempt N)… forever in the frontend log</td>
+          <td>The database container is not listening. Confirm <code>DDB_ENDPOINT</code> is <code>http://localhost:8000</code>, and read the database container's own log stream.</td>
+        </tr>
+        <tr>
+          <td>Two tasks running, both unhealthy, after a redeploy</td>
+          <td>Minimum running tasks is above 0%, so two containers are fighting over one SQLite file. Step 10.</td>
+        </tr>
+      </table></div>
+
+      <h2 class="sec">What this deliberately leaves out</h2>
+      <p>No load balancer, so the address changes; no private subnets, so the task is directly reachable; and a database container rather than the managed DynamoDB service. That last one is the honest limit of this lab — DynamoDB Local exists to teach the API without a bill, and running it on EFS is how you give a Fargate task any durable disk at all.</p>
+      <p>The production shape of this app is smaller, not bigger: point it at real DynamoDB and the database container, the EFS file system, the access point, the mount targets and their security group all disappear. What replaces them is one task role granting the app access to its table.</p>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  Aviz Academy · Batch 10 · Every step in this runbook was executed against a live account before publication.
+</footer>
+
+<script>
+(function () {
+  var STEPS = [
+    ['s1','Create ECR repo'],['s2','Build &amp; push image'],['s3','Security groups'],
+    ['s4','EFS file system'],['s5','EFS access point'],['s6','Log group'],
+    ['s7','Execution role'],['s8','ECS cluster'],['s9','Task definition'],
+    ['s10','Create service'],['s11','Open &amp; verify'],['s12','Tear down']
+  ];
+
+  /* ---- side rail ---- */
+  var nav = document.getElementById('nav');
+  nav.innerHTML = STEPS.map(function (s, i) {
+    return '<li><a href="#' + s[0] + '" data-for="' + s[0] + '">' +
+           '<span class="n">' + (i + 1) + '</span><span>' + s[1] + '</span></a></li>';
+  }).join('');
+
+  /* ---- storage helpers (never let a blocked store break the page) ---- */
+  function load(k, d) {
+    try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; }
+  }
+  function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* ---- your values ---- */
+  var INPUTS = { acct: 'acct', reg: 'reg', proj: 'proj' };
+  function apply(key, val) {
+    var nodes = document.querySelectorAll('.v[data-v="' + key + '"]');
+    for (var i = 0; i < nodes.length; i++) nodes[i].textContent = val;
+  }
+  Object.keys(INPUTS).forEach(function (key) {
+    var el = document.getElementById(INPUTS[key]);
+    var stored = load('todoecs.' + key, null);
+    if (stored) el.value = stored;
+    apply(key, el.value);
+    el.addEventListener('input', function () {
+      var v = el.value.trim() || el.defaultValue;
+      apply(key, v);
+      save('todoecs.' + key, el.value);
+    });
+  });
+
+  /* ---- copy buttons ---- */
+  var btns = document.querySelectorAll('.copy');
+  for (var b = 0; b < btns.length; b++) {
+    (function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.parentNode.querySelector('code');
+        var text = code.innerText;
+        function ok() {
+          btn.textContent = 'Copied';
+          btn.classList.add('done');
+          setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok, function () {});
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); ok(); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+      });
+    })(btns[b]);
+  }
+
+  /* ---- progress checkboxes ---- */
+  function bindCheck(box, key, onChange) {
+    box.checked = load(key, '') === '1';
+    if (onChange) onChange(box.checked);
+    box.addEventListener('change', function () {
+      save(key, box.checked ? '1' : '0');
+      if (onChange) onChange(box.checked);
+    });
+  }
+
+  var pre = document.querySelectorAll('#pre input[type=checkbox]');
+  for (var p = 0; p < pre.length; p++) {
+    (function (box) {
+      var label = box.nextElementSibling;
+      bindCheck(box, 'todoecs.pre.' + box.id, function (on) {
+        label.classList.toggle('done-mark', on);
+      });
+    })(pre[p]);
+  }
+
+  var marks = document.querySelectorAll('.mark input[type=checkbox]');
+  for (var m = 0; m < marks.length; m++) {
+    (function (box) {
+      var id = box.getAttribute('data-step');
+      var link = nav.querySelector('a[data-for="' + id + '"]');
+      bindCheck(box, 'todoecs.step.' + id, function (on) {
+        if (link) link.classList.toggle('done', on);
+      });
+    })(marks[m]);
+  }
+
+  /* ---- scrollspy ---- */
+  var sections = document.querySelectorAll('.step');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var link = nav.querySelector('a[data-for="' + e.target.id + '"]');
+        if (link && e.isIntersecting) {
+          var all = nav.querySelectorAll('a');
+          for (var i = 0; i < all.length; i++) all[i].classList.remove('on');
+          link.classList.add('on');
+        }
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    for (var s = 0; s < sections.length; s++) io.observe(sections[s]);
+  }
+})();
+</script>

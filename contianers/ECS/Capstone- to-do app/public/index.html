@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My To-Do List | Aviz Academy</title>
+  <link rel="icon" href="images/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Soft glow that follows the mouse pointer -->
+  <div class="cursor-glow" id="cursor-glow"></div>
+
+  <!-- Sticky header: the logo stays visible while scrolling -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/">
+        <img src="images/logo.png" alt="Aviz Academy" class="logo" />
+      </a>
+      <div class="titles">
+        <h1>My To-Do List</h1>
+        <p class="subtitle">Aviz Academy &ndash; Batch 10 Docker Demo</p>
+      </div>
+      <div class="header-date" id="today-label"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Add / edit form -->
+    <section class="card form-card" id="form-card">
+      <div class="card-head">
+        <span class="card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </span>
+        <div>
+          <h2 id="form-heading">Add a new task</h2>
+          <p class="card-sub" id="form-subheading">Fill in the details and press Add task</p>
+        </div>
+      </div>
+
+      <form id="task-form">
+        <input type="hidden" id="task-id" />
+
+        <div class="field">
+          <label for="title">Task title <span class="req">*</span></label>
+          <input type="text" id="title" placeholder="What needs to be done?" autocomplete="off" required />
+        </div>
+
+        <div class="field">
+          <label for="description">Description <span class="opt">optional</span></label>
+          <textarea id="description" rows="2" placeholder="Add a few more details..."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="dueDate">Due date <span class="req">*</span></label>
+          <input type="date" id="dueDate" required />
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <span class="btn-label">Add task</span>
+          </button>
+          <button type="button" id="cancel-btn" class="btn btn-ghost hidden">Cancel</button>
+        </div>
+
+        <p id="form-error" class="error hidden"></p>
+      </form>
+    </section>
+
+    <!-- Filters -->
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter active" data-filter="all">
+          All <span class="count" id="count-all">0</span>
+        </button>
+        <button class="filter" data-filter="pending">
+          Pending <span class="count" id="count-pending">0</span>
+        </button>
+        <button class="filter" data-filter="completed">
+          Completed <span class="count" id="count-completed">0</span>
+        </button>
+      </div>
+      <div class="overdue-chip hidden" id="overdue-chip"></div>
+    </div>
+
+    <!-- Task list -->
+    <ul id="task-list" class="task-list"></ul>
+
+    <div id="empty-message" class="empty hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M9 11l3 3L22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+      </svg>
+      <p>Nothing here yet</p>
+      <span>Add a task above to get started.</span>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Built with Node.js, Express and a JSON file &middot; Aviz Academy Batch 10
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

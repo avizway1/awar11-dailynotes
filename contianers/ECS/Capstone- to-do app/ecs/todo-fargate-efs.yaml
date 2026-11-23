@@ -1,0 +1,258 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  To-Do app POC - one ECS Fargate task running two containers
+  (frontend + DynamoDB Local), with the database file stored on EFS.
+
+# The two containers live in the SAME task, so they share one network
+# namespace. That is why the frontend talks to DynamoDB on "localhost:8000"
+# and why no service discovery / load balancer is needed for this POC.
+#
+# DynamoDB Local keeps everything in a single SQLite file. Putting that file on
+# EFS is what makes the data outlive the task: Fargate has no disk you can
+# keep, so when ECS replaces the task, the new container mounts the same EFS
+# directory and every task is still there.
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: ECR image URI for the frontend, e.g. 111122223333.dkr.ecr.ap-south-1.amazonaws.com/todo-app:latest
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to run in (the default VPC is fine)
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Exactly TWO public subnets, in two different Availability Zones
+
+  TableName:
+    Type: String
+    Default: Tasks
+    Description: DynamoDB table name (created by the app on first start)
+
+Resources:
+
+  # ---------------------------------------------------------------
+  # Networking
+  # ---------------------------------------------------------------
+
+  TaskSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: To-Do app task - allow the web port from anywhere
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+          Description: Web UI
+      # Port 8000 is deliberately NOT opened. DynamoDB Local is only reachable
+      # from inside the task, over localhost.
+
+  EfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS mount targets - allow NFS from the task only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref TaskSecurityGroup
+          Description: NFS from the ECS task
+
+  # ---------------------------------------------------------------
+  # EFS - where the DynamoDB Local database file lives
+  # ---------------------------------------------------------------
+
+  FileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-dynamodb-data'
+
+  # A mount target is the network endpoint EFS exposes inside a subnet.
+  # The task can only mount EFS from a subnet that has one.
+  MountTargetA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId: !Select [0, !Ref SubnetIds]
+      SecurityGroups: [!Ref EfsSecurityGroup]
+
+  MountTargetB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId: !Select [1, !Ref SubnetIds]
+      SecurityGroups: [!Ref EfsSecurityGroup]
+
+  # The access point pins the directory and the POSIX user, so the database
+  # owns its own files without anything having to run as root.
+  #
+  # 1000 is the uid/gid of the "dynamodblocal" user inside the DynamoDB Local
+  # image. If these numbers do not match the image, the container starts and
+  # then fails with "unable to open database file".
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref FileSystem
+      PosixUser:
+        Uid: '1000'
+        Gid: '1000'
+      RootDirectory:
+        Path: /ddbdata
+        # CreationInfo only applies the first time this directory is created.
+        CreationInfo:
+          OwnerUid: '1000'
+          OwnerGid: '1000'
+          Permissions: '0755'
+
+  # ---------------------------------------------------------------
+  # ECS
+  # ---------------------------------------------------------------
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${AWS::StackName}'
+      RetentionInDays: 7
+
+  # Used by the ECS agent (not the app) to pull the image and write logs.
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${AWS::StackName}-cluster'
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${AWS::StackName}'
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      # DynamoDB Local is a Java process, so give the task a bit more room
+      # than a plain Node app would need.
+      Cpu: '1024'
+      Memory: '2048'
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      # No TaskRole: the app talks to DynamoDB Local, which ignores IAM
+      # entirely. Switching to the managed DynamoDB service is where a task
+      # role becomes necessary - see ecs/README.md.
+
+      Volumes:
+        - Name: dynamodb-data
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref FileSystem
+            TransitEncryption: ENABLED
+            AuthorizationConfig:
+              AccessPointId: !Ref AccessPoint
+
+      ContainerDefinitions:
+
+        # ---- container 2: the database -------------------------------
+        - Name: database
+          # Pulled from ECR Public rather than Docker Hub, so Fargate never
+          # hits Docker Hub's anonymous pull rate limit.
+          Image: public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:latest
+          Essential: true
+          # The image defaults to -inMemory, which would throw the data away on
+          # every restart and make the EFS volume pointless. -sharedDb keeps
+          # everything in ONE file no matter which region or credentials the
+          # client sends, and -dbPath puts that file on the EFS mount.
+          Command:
+            - '-jar'
+            - 'DynamoDBLocal.jar'
+            - '-sharedDb'
+            - '-dbPath'
+            - '/home/dynamodblocal/data'
+          User: '1000:1000'
+          MountPoints:
+            - SourceVolume: dynamodb-data
+              ContainerPath: /home/dynamodblocal/data
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: database
+
+        # ---- container 1: the frontend -------------------------------
+        - Name: frontend
+          Image: !Ref ImageUri
+          Essential: true
+          PortMappings:
+            - ContainerPort: 3000
+          Environment:
+            # Same task = same network namespace, so the database is on localhost.
+            # Unset this variable and the app talks to real DynamoDB instead.
+            - Name: DDB_ENDPOINT
+              Value: http://localhost:8000
+            - Name: DDB_TABLE
+              Value: !Ref TableName
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+          # DynamoDB Local has no health check command in its image, so this
+          # only waits for the container to start. The app itself retries the
+          # connection for about a minute, which covers the rest.
+          DependsOn:
+            - ContainerName: database
+              Condition: START
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: frontend
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: [MountTargetA, MountTargetB]
+    Properties:
+      ServiceName: !Sub '${AWS::StackName}-service'
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      DesiredCount: 1
+      # DynamoDB Local is a single SQLite file, so only one container may write
+      # to it. On a redeploy the old task must stop BEFORE the new one starts.
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          # A public IP is how the task pulls images and how you reach the UI.
+          # No load balancer, which keeps this POC cheap and simple.
+          AssignPublicIp: ENABLED
+          Subnets: !Ref SubnetIds
+          SecurityGroups: [!Ref TaskSecurityGroup]
+
+Outputs:
+  ClusterName:
+    Value: !Ref Cluster
+
+  ServiceName:
+    Value: !GetAtt Service.Name
+
+  FileSystemId:
+    Value: !Ref FileSystem
+
+  LogGroupName:
+    Value: !Ref LogGroup
