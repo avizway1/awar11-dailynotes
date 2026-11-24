@@ -133,6 +133,130 @@ EKS Cluster creation has 3 options.
 
 ================================================================================================
 
+D: 24/11/2026
+
+Imperative Approach : we can directly execute a command in our terminal. It is fast to create and manage resources but it has limitations. It's difficult to track the resource and its changes. 
+
+Below command crete an EKS cluster with 2 AWS Managed Nodes with c7i-flex.large configuration. 
+
+eksctl create cluster --name ekswithavinash --version 1.36 --region ap-south-1 --zones=ap-south-1a,ap-south-1b --nodegroup-name myeksnodes --nodes 2 --nodes-min 1 --nodes-max 4 --node-type c7i-flex.large --node-ami-family AmazonLinux2023 --managed
+
+=============
+
+Create only cluster
+
+eksctl create cluster --name ekswithavinash --region ap-south-1 --with-oidc --without-nodegroup
+
+Create a full managed node group
+
+eksctl create nodegroup --cluster ekswithavinash --region ap-south-1 --name ng-default --nodes 2 --nodes-min 1 --nodes-max 4 --node-type c7i-flex.large --node-ami-family AmazonLinux2023 --managed --node-volume-size 30 --ssh-access --ssh-publickey awar12.pem --full-ecr-access
+
+scale a node group
+
+eksctl scale nodegroup --cluster ekswithavinash --region ap-south-1 --name ng-default --nodes 3 --nodes-min 2 --nodes-max 5 --wait
+
+======================================
+
+Declarative approach : we can write a manifest file and we can apply it to create the resources. All the changes we can apply via a manifest file so it is easier to track the changes. 
+
+Refer the shared cluster.yaml file to create the cluster with below command
+
+eksctl create cluster -f cluster.yaml
+
+
+============================================================================
+
+EKS has 2 types of supports
+
+1. Standard support : 0.10$/Hour
+2. Extended support : 0.50$/Hour
+
+============================================================================
+
+Once the cluster creation is completed we need to update the kubeconfig file on our laptop. 
+
+windows: c:/users/administrator/.kube/config
+Linux: ~/.kube/config
+
+aws eks update-kubeconfig --region ap-south-1 --name ekswithavinash
+
+--------
+
+OIDC : OpenID Connect : It is an open identity authentication protocol. THis is build on top of OAuth 2.0 framework.
+
+Enable OIDC provider on EKS cluster to get permissions inside the EKS cluster.
+
+eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster ekswithavinash --approve
+
+==========================
+
+pod : Pod is the smallest deployable unit in Kubernetes. A pod contains a container. 
+- We cannot directly run a container in Kubernetes. 
+- A pod is a wrapper around the container. 
+
+Question: can a pod contain multiple containers? 
+Ans: we can have multiple containers but we always have one primary container that does the actual job. The other container is the helper container. We call that helper container a sidecar container. 
+
+One important point: both containers can't use the same port. Both run on two different ports. 
+
+kubectl apply -f <manifest>.yaml
+
+kubectl apply -f 01-pod.yaml --dry-run=server
+kubectl apply -f 01-pod.yaml
+
+kubectl get pods
+kubectl get pods -o wide				(KCNA** : Shows IP and Node Info)
+
+kubectl describe pods myfirstpod		: FUll details about the pod and its container along with events.
+
+kubectl logs myfirstpod					: Shows container logs.
+
+kubectl logs -f myfirstpod				: Shows live logs		(KCNA**)
+
+kubectl logs myfirstpod --previous		: Shows crashed container logs.
+kubectl logs myfirstpod -p
+
+kubectl get events						: Shows all the occured events in k8s
+
+===========
+
+Problem with running our application via only a pod:
+- For any reason if the pod got deleted, it is gone. 
+- It won't create a new pod automatically. 
+
+Solution : ReplicaSet
+
+Replicaset : a replica set will ensure our application is running with a given number of identical pods. If any of the pods gets deleted, it will automatically create another pod.. almost instantly. 
+
+selector : selector defines how the replica set identifies which pod is responsible for. Match label looks for the pod that has the label. 
+
+kubectl get rs
+kubectl get replicaset
+
+alias k='kubectl'
+alias kgp='kubectl get pods'
+alias kgr='kubectl get rs'
+
+apiVersion: v1
+Supported Components: pods, service, namespace, configmaps and secrets
+
+apiVersion: apps/v1
+Supported Components: ReplicaSets, Deployments, DaemonSets
+
+
+myfirstrs-6xhvh myfirstrs-hq7v2
+
+k delete pods myfirstrs-47k2w myfirstrs-hnx9x myfirstrs-lwfb2 myfirstrs-nxdks
+
+k get pods
+
+
+
+
+
+
+
+
 
 
 
