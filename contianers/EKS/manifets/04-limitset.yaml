@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynginx-with-limit
+  annotations:
+    kubernetes.io/change-cause: "applied resource limitations"
+    team-owner: "avinash@avizacademy.com"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myfirstcontainer
+        image: nginx:1.31.10
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "64Mi"

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynginx
+  annotations:
+    kubernetes.io/change-cause: "updating container port to 8080"
+    team-owner: "avinash@avizacademy.com"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myfirstcontainer
+        image: nginx:1.31.10
+        ports:
+        - containerPort: 8080

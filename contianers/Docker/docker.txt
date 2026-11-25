@@ -708,4 +708,7 @@ step 4 : Push the image to ECR Registry
 docker push 992189742322.dkr.ecr.ap-south-1.amazonaws.com/tttapp:multi
 
 
+-------
+
+docker diff <CONTAINER_NAME_OR_ID>
 

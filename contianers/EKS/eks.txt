@@ -233,6 +233,8 @@ selector : selector defines how the replica set identifies which pod is responsi
 kubectl get rs
 kubectl get replicaset
 
+kubectl delete rs mynginx-757499fdb5
+
 alias k='kubectl'
 alias kgp='kubectl get pods'
 alias kgr='kubectl get rs'
@@ -250,22 +252,93 @@ k delete pods myfirstrs-47k2w myfirstrs-hnx9x myfirstrs-lwfb2 myfirstrs-nxdks
 
 k get pods
 
+====================================================================================
+
+D: 25/11/2026
+
+
+nginx:1.30.8			--> old version
+
+nginx:1.31.10			--> new version
+
+
+-----
+
+To connect to a pod, we can use exec command
+
+docker exec -it <container> /bin/sh
+
+kubectl exec -it <pod> -- /bin/sh
+kubectl exec -it myfirstrs-4qjns -- /bin/sh
+nginx -version
+
+kubectl exec -it mynginx-57b667c787-78rsb -- /bin/sh
+
+
+-----
+
+
+Problem with replicaset: we cannot perform application version upgrades using replica sets. 
+- Replicaset: ensures identical copies of our pods runs. 
+
+Ans: Deployment
+
+
+Deployment : deployment is the Kubernetes highest level of abstraction that manages the replicaset and pods. 
+
+
+mynginx-57b667c787-78rsb   1/1     Running   0          97s
+mynginx-57b667c787-828xx   1/1     Running   0          97s
+mynginx-57b667c787-cscxq   1/1     Running   0          97s
+mynginx-57b667c787-xfzqk   1/1     Running   0          97s
+
+k get pods --watch
+k get pods -w
 
 
 
+kubectl rollout history deployment/mynginx
+kubectl rollout undo deployment/mynginx
+
+kubectl rollout undo deployment/mynginx --to-revision=1
+
+kubectl rollout status deployment/mynginx
+kubectl rollout restart deployment/mynginx
+
+kubectl exec -it mynginx-7bc5ff579f-9gdw5 -- /bin/sh
+
+kubectl delete rs mynginx-757499fdb5
 
 
+=========================================================================================================
+
+Resource limiting : we can define how much memory or CPU should be allocated to the container. If we don't define this value, however much is available on our underlying host container will be available to the container as well. 
+problem : one container may consume all the underlying host resources. other containers end up with resource constrain.
+
+Requests : guaranteed minimum : minimum CPU or memory Kubernetes guarantees to allocate to the container.
+limits: hard ceiling : the maximum CPU or memory a container is permitted to consume. This option prevents a single container from consuming all the resources. 
 
 
+kubectl describe pod mynginx-b586d5994-8bpgb
+
+Memory: 
+M	Megabyte		: 500Mi
+Mi	Mebibyte		: 500Mi
+1 GiB				: 1,024 Mi
+1 GB				: ~953.67 Mi
+
+CPU Measured in millicores / cores: 
+1000m		: 1 vCPU
+250m		: 0.25 CPU (25% of 1 CPU)
 
 
+kubectl describe pod mynginx-with-limit-7ccb6b9b74-hrfv6
 
 
+kubectl exec -it mynginx-with-limit-7ccb6b9b74-hrfv6 -- /bin/sh
 
-
-
-
-
+kubectl top pods
+kubectl top nodes
 
 
 
