@@ -1,107 +1,26 @@
-# =========================================================
 # Terraform
-# =========================================================
-
-# Terraform working directory
+**/.terraform/
 .terraform/
-**/.terraform/*
 
-# Terraform state files
+# Terraform state
 *.tfstate
 *.tfstate.*
 terraform.tfstate
 terraform.tfstate.backup
 
+# Terraform plans
+*.tfplan
+*.plan
+
+# Sensitive variables
+*.tfvars
+*.tfvars.json
+!*.example.tfvars
+!*.tfvars.example
+
 # Crash logs
 crash.log
 crash.*.log
 
-# Terraform plans (may contain sensitive information)
-*.tfplan
-*.plan
-
-# Terraform lock file
-# Recommended: DO NOT ignore this file
-# .terraform.lock.hcl should be committed
-
-# Terraform CLI configuration
-.terraformrc
-terraform.rc
-
-
-# =========================================================
-# Sensitive Variables
-# =========================================================
-
-# Actual variable files containing credentials/secrets
-*.tfvars
-*.tfvars.json
-
-# Keep sample/example variable files
-!*.example.tfvars
-!*.tfvars.example
-!terraform.tfvars.example
-
-# Files containing secrets
-secrets.tf
-secrets.json
-credentials.json
-*.pem
-*.key
-
-
-# =========================================================
-# AWS Credentials
-# =========================================================
-
-.aws/
-.aws-credentials
-credentials
-
-# Environment variables
-.env
-.env.*
-!.env.example
-
-
-# =========================================================
-# Logs
-# =========================================================
-
-*.log
-logs/
-
-
-# =========================================================
-# OS Generated Files
-# =========================================================
-
-# macOS
+# OS files
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-Desktop.ini
-
-# Linux
-*~
-
-
-# =========================================================
-# IDEs and Editors
-# =========================================================
-
-# VS Code
-.vscode/
-
-# IntelliJ / JetBrains
-.idea/
-
-# Vim
-*.swp
-*.swo
-
-# Emacs
-*~
