@@ -12,12 +12,6 @@ terraform.tfstate.backup
 *.tfplan
 *.plan
 
-# Sensitive variables
-*.tfvars
-*.tfvars.json
-!*.example.tfvars
-!*.tfvars.example
-
 # Crash logs
 crash.log
 crash.*.log

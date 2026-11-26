@@ -1,0 +1,6 @@
+ami_id        = "ami-022374b883d9d7931"
+instance_type = "t3.micro"
+name          = "project-ec2"
+bucket_name   = "project-testbucket-modules-demo-aviz11"
+iamuser       = "project-iamuser"
+region        = "ap-south-1"
