@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: mynginx
   annotations:
-    kubernetes.io/change-cause: "updating container port to 8080"
+    kubernetes.io/change-cause: "my initial deployment"
     team-owner: "avinash@avizacademy.com"
 spec:
   replicas: 4
@@ -19,4 +19,4 @@ spec:
       - name: myfirstcontainer
         image: nginx:1.31.10
         ports:
-        - containerPort: 8080
+        - containerPort: 80

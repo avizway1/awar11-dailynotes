@@ -1,0 +1,4 @@
+# Bash breaks on Windows CRLF line endings ("$'\r': command not found"),
+# so keep .sh files LF everywhere. PowerShell scripts are fine as CRLF.
+*.sh  text eol=lf
+*.ps1 text eol=crlf
