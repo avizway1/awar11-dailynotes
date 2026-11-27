@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: myapp2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynginx
+  namespace: myapp2
+  annotations:
+    kubernetes.io/change-cause: "my initial deployment"
+    team-owner: "avinash@avizacademy.com"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myfirstcontainer
+        image: nginx:1.31.10
+        ports:
+        - containerPort: 80

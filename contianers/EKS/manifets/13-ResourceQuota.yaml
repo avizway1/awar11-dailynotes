@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-app-limit
+  namespace: myapp
+spec:
+  hard:
+    requests.cpu: "1"             #Min Guranteed CPU across all pods
+    requests.memory: "1Gi"        #Min Guranteed memory across all pods
+    limits.cpu: "2"               #max hard ceiling for total CPU usage
+    limits.memory: "4Gi"          #max hard ceiling for total Memory usage

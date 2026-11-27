@@ -398,16 +398,55 @@ Port Range : 30,000 - 32,767
 - It doesn't create a ClusterIP / Proxy or it wont use Loadbalancer.
 
 
+===========================================================================================
+
+D: 27/11/2026
+
+Problem 1 : when multiple teams are using the same cluster, they may use the same labels so their work may be overridden. 
+
+Problem 2 : when multiple teams are using the same cluster, one particular team may consume more resources so another team may end up with "resource not available" errors. 
+
+Namespace : logical isolation.
+Create a seperate cluster for hard / physical isolations.
+
+default : this is the default namespace. By default our workload runs or creates here, if we dont specify namespace in our manifest file. 
+
+kube-system : in Kubernetes all the internal components run in this kube-system namespace. Not recommended to modify, delete, or deploy our regular workload in this kube-system namespace.
+
+kube-node-lease : this namespace acts as a health heartbeat tracker. It manages the nodes' heartbeat to track node availability within our cluster. 
+
+kube-public : this namespace is readable by anyone even without authentication. We don't deploy any workload here. 
+
+------------------
+
+kubectl get pods				: Shows pods from default namespace
+kubectl get pods -n kube-system	: Shows pods from kube-system namespace
+
+kubectl get all					: shows all components from defualt namespace
+kubectl get all -A				: shows all components from all namespaces
+
+kubectl get pods -A
+
+kubectl create namespace testns2
+
+kubectl config set-context --current --namespace=myapp		: sets "myapp" as the default namespace so we have no need to pass the `-n myapp` argument along with other commands. 
+
+kubectl get pods -n default
+
+-------
+
+Addressing problem 2: one team is utilising more resources so the other team does not have any resources to run their workload. 
+
+We can apply limit ranges. Whatever workload we are scheduling within the namespace, it should be within that range. 
+
+---
+
+Resource Quotas : to restrict the total CPU and memory consumption across the entire namespace, we can use resource quotas.
+- Resource quotas act as a hard ceiling. 
+- Once the sum of all pods in the namespace hits the limit, Kubernetes prevents new pod creation.
 
 
-
-
-
-
-
-
-
-
+kubectl run test-exceed-pod --image=nginx --requests="cpu=500m,memory=512Mi" --limits="cpu=1,memory=1Gi"
 
 
 

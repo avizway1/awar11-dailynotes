@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myfirstpod-fail
+spec:
+  containers:
+  - name: myfirstcontainer
+    image: nginx
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        cpu: "2"
+        memory: "2Gi"
+      requests:
+        memory: "2Gi"
+        cpu: "2"
